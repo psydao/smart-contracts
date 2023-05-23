@@ -4,7 +4,7 @@ You are required to develop the smart contracts and test files for a simple gues
 
 ### Game Overview:
 
-The game must allow a player to guess either 'red' or 'black'. On guessing, a player should pay a specified entrance fee in a ERC20 compliant token which you will create. If a player wins, they will receive double their entrance fee and a 'Champion' NFT. If a player loses, they will receive nothing. A player is only ever allowed to play once.
+The game must allow a player to guess either 'red' or 'black'. On guessing, a player should pay a specified entrance fee in a ERC20 compliant token which you will create. The player is trying to guess the same colour as the player to guess after them. If a player is correct / wins the game, they will receive double their entrance fee and a 'Champion' NFT. If a player loses, they will receive nothing. A player is only ever allowed to play once.
 
 ### The Entrance Fee:
 
@@ -16,9 +16,9 @@ The ERC20 used for entrance should be one you create in this task. It should hav
 
 Upon winning the game, the player should receive a basic NFT which you are tasked to create. The NFT should be bound to the player who won it. In other words, they should not be able to sell / transfer it to anyone else.
 
-### Outcomes:
+### Example:
 
-A player is attempting to guess the same colour as the next player to guess after them. Meaning if Alice guesses 'Black', to win the game, the next player would also need to guess 'Black'. If the next player guesses 'Red', Alice loses her entrance fee.
+Alice enters the game and pays 40 ERC20 tokens. She guesses 'Black'. She now waits until a new player comes along to guess. Bob then enters the game, paying his 40 ERC20 tokens and guesses 'Black'. Alice has won and will now recieve a 'Champion' NFT and double her money back (her initial entrance * 2). If Bob had guessed 'Red', Alice would have lost and her funds would be held by the game. No matter the outcome for Alice, Bob now waits for the next player to guess.
 
 ### Other points to consider:
 
