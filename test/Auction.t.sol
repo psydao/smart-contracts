@@ -3,6 +3,6 @@ pragma solidity 0.8.15;
 
 import "forge-std/Test.sol";
 
-contract GameLogicTest is Test {
+contract AuctionTest is Test {
    
 }
