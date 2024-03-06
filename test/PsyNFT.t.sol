@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.15;
+pragma solidity 0.8.20;
 
 import "forge-std/Test.sol";
 
-contract GameLogicTest is Test {
+
+contract PsyNFTTest is Test {
    
 }
