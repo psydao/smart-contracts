@@ -50,6 +50,10 @@ contract PsyNFT is ERC721, Ownable2Step {
         previousFibonacci = batchAmount;
     }
 
+    function transferAllToAuction() external onlyOwner {
+        
+    }
+
     /// @notice Allows contract to receive NFTs
     /// @dev Returns the valid selector to the ERC721 contract to prove contract can hold NFTs
     function onERC721Received(address, address, uint256, bytes calldata) external pure returns (bytes4) {

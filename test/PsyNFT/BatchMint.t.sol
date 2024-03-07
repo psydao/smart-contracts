@@ -1,37 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.20;
 
-import "forge-std/Test.sol";
-import "../src/PsyNFT.sol";
+import "../TestSetup.sol";
+import "../../src/PsyNFT.sol";
 
 
-contract PsyNFTTest is Test {
-
-    error OwnableUnauthorizedAccount(address account);
-
-    PsyNFT public psyNFT;
-
-    address owner = vm.addr(1);
-    address alice = vm.addr(2);
-    address bob = vm.addr(3);
+contract BatchMintTest is TestSetup {
 
     function setUp() public {
-        vm.startPrank(owner);
-        psyNFT = new PsyNFT();
-        vm.stopPrank();
-    }
-
-    function test_InitialMintFailsWhenNotOwner() public {
-        vm.prank(alice);
-        vm.expectRevert(abi.encodeWithSelector(OwnableUnauthorizedAccount.selector, address(alice)));
-        psyNFT.initialMint();
-    }
-
-    function test_InitialMintFailsWhenAlreadyCalled() public {
-         vm.startPrank(owner);
-        psyNFT.initialMint();
-        vm.expectRevert("Initial mint completed");
-        psyNFT.initialMint();
+        setUpTests();
     }
 
     function test_BatchMintFailsWhenNonOwner() public {
@@ -79,5 +56,5 @@ contract PsyNFTTest is Test {
 
         vm.stopPrank();
     }
-   
+
 }
