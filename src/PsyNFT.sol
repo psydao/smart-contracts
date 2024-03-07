@@ -39,8 +39,8 @@ contract PsyNFT is ERC721, Ownable2Step {
         uint256 batchAmount = secondLastFibonacci + previousFibonacci;
         uint256 localTokenId = tokenId;
 
-        for(uint256 x; x < batchAmount; x++) {
-            _mint(address(this), localTokenId);
+        for(uint256 x = 0; x < batchAmount; x++) {
+            _safeMint(address(this), localTokenId);
             localTokenId++;
         }
 
@@ -48,5 +48,11 @@ contract PsyNFT is ERC721, Ownable2Step {
 
         secondLastFibonacci = previousFibonacci;
         previousFibonacci = batchAmount;
+    }
+
+    /// @notice Allows contract to receive NFTs
+    /// @dev Returns the valid selector to the ERC721 contract to prove contract can hold NFTs
+    function onERC721Received(address, address, uint256, bytes calldata) external pure returns (bytes4) {
+        return IERC721Receiver.onERC721Received.selector;
     }
 }

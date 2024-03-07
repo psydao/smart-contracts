@@ -6,5 +6,7 @@
   "search.exclude": { "lib": true },
   "files.associations": {
     ".gas-snapshot": "julia"
-  }
+  },
+  "slither.solcPath": "",
+  "slither.hiddenDetectors": []
 }
