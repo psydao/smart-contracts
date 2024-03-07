@@ -17,6 +17,8 @@ contract PsyNFT is ERC721, Ownable2Step {
 
     }
 
+    /// @notice Mints the initial 5 NFT's for the founding members
+    /// @dev This is a unique function to begin the DAO and should only be called once
     function initialMint() external onlyOwner {
         require(!initialMintCalled, "Initial mint completed");
         uint256 localTokenId = 0;
@@ -31,6 +33,8 @@ contract PsyNFT is ERC721, Ownable2Step {
         initialMintCalled = true;
     }
     
+    /// @notice Mints new NFT's following the fibonacci sequence
+    /// @dev Each batch amount follows the fibonacci sequence
     function mintBatchInFibonacci() external onlyOwner {
         uint256 batchAmount = secondLastFibonacci + previousFibonacci;
         uint256 localTokenId = tokenId;
