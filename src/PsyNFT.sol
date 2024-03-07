@@ -13,6 +13,8 @@ contract PsyNFT is ERC721, Ownable2Step {
 
     bool public initialMintCalled;
 
+    mapping(uint256 => bool) public currentTokensBeingHeld;
+
     constructor() ERC721("PsyNFT", "PSY") Ownable(msg.sender) {
 
     }
@@ -50,13 +52,16 @@ contract PsyNFT is ERC721, Ownable2Step {
         previousFibonacci = batchAmount;
     }
 
-    function transferAllToAuction() external onlyOwner {
-        
+    function transferNFTs(uint256[] memory _tokenIds, address _recipient) external onlyOwner {
+        require(_recipient != address(0), "Cannot be address 0");
+        for(uint256 x; x < _tokenIds.length; x++) {
+            _safeTransfer(address(this), _recipient, _tokenIds[x]);
+        }
     }
 
     /// @notice Allows contract to receive NFTs
     /// @dev Returns the valid selector to the ERC721 contract to prove contract can hold NFTs
-    function onERC721Received(address, address, uint256, bytes calldata) external pure returns (bytes4) {
+    function onERC721Received(address, address, uint256 _tokenId, bytes calldata) external returns (bytes4) {
         return IERC721Receiver.onERC721Received.selector;
     }
 }

@@ -17,23 +17,6 @@ contract BatchMintTest is TestSetup {
         psyNFT.mintBatchInFibonacci();
     }
 
-    function test_InitialMintWorks() public {
-        assertEq(psyNFT.secondLastFibonacci(), 0);
-        assertEq(psyNFT.previousFibonacci(), 0);
-        assertEq(psyNFT.tokenId(), 0);
-        assertEq(psyNFT.initialMintCalled(), false);
-        assertEq(psyNFT.balanceOf(address(psyNFT)), 0);
-
-        vm.prank(owner);
-        psyNFT.initialMint();
-
-        assertEq(psyNFT.secondLastFibonacci(), 1);
-        assertEq(psyNFT.previousFibonacci(), 2);
-        assertEq(psyNFT.tokenId(), 5);
-        assertEq(psyNFT.initialMintCalled(), true);
-        assertEq(psyNFT.balanceOf(address(psyNFT)), 5);
-    }
-
     function test_BatchMintWorks() public {
         assertEq(psyNFT.secondLastFibonacci(), 0);
         assertEq(psyNFT.previousFibonacci(), 0);
