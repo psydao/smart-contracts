@@ -39,7 +39,7 @@ contract PsyNFT is ERC721, Ownable2Step {
         uint256 batchAmount = secondLastFibonacci + previousFibonacci;
         uint256 localTokenId = tokenId;
 
-        for(uint256 x = 0; x < batchAmount; x++) {
+        for(uint256 x; x < batchAmount; x++) {
             _safeMint(address(this), localTokenId);
             localTokenId++;
         }
