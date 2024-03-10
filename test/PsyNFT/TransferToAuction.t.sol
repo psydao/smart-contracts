@@ -33,13 +33,13 @@ contract TransferToAuctionTest is TestSetup {
 
     function test_TransferNfts() public {
         vm.startPrank(owner);
+
         psyNFT.initialMint();
 
         uint256[] memory tokenIdsForAuction = new uint256[](2);
         tokenIdsForAuction[0] = 2;
         tokenIdsForAuction[1] = 4;
         assertEq(psyNFT.ownerOf(2), address(psyNFT));
-
         psyNFT.transferNFTs(tokenIdsForAuction, address(auction));
 
         assertEq(psyNFT.ownerOf(2), address(auction));

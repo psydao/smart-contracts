@@ -7,6 +7,8 @@ import "forge-std/console.sol";
 
 contract PsyNFT is ERC721, Ownable2Step {
     struct TransferRequest {
+        uint256 tokenId;
+        uint256 expiryDate;
         address from;
         address to;
         bool approved;
@@ -15,6 +17,7 @@ contract PsyNFT is ERC721, Ownable2Step {
     uint256 public tokenId;
     uint256 public secondLastFibonacci;
     uint256 public previousFibonacci;
+    uint256 public transferWindowPeriod;
 
     bool public initialMintCalled;
 
@@ -31,7 +34,7 @@ contract PsyNFT is ERC721, Ownable2Step {
         uint256 localTokenId = 0;
 
         for(localTokenId; localTokenId < 5; localTokenId++) {
-            _mint(address(this), localTokenId);
+            _safeMint(address(this), localTokenId);
         }
 
         tokenId = localTokenId;
@@ -58,15 +61,43 @@ contract PsyNFT is ERC721, Ownable2Step {
     }
 
 
-    function transferNFTs(uint256[] memory _tokenIds, address _recipient) external onlyOwner {
+    function transferNFTs(
+        uint256[] memory _tokenIds, 
+        address _recipient
+    ) external onlyOwner {
         require(_recipient != address(0), "Cannot be address 0");
         for(uint256 x; x < _tokenIds.length; x++) {
             _safeTransfer(address(this), _recipient, _tokenIds[x]);
         }
     }
 
-    function _update(address to, uint256 tokenIds, address auth) internal override returns (address) {
-        return super._update(to, tokenIds, auth);
+    function submitTransferRequest(
+        address _to, 
+        uint256 _tokenId
+    ) external {
+        require(msg.sender == ownerOf(_tokenId), "Not token owner");
+        require(block.timestamp > transferRequests[_tokenId].expiryDate, "Transfer request currently active");
+        
+        transferRequests[_tokenId] = TransferRequest({
+            tokenId: _tokenId,
+            expiryDate: block.timestamp + transferWindowPeriod,
+            from: msg.sender,
+            to: _to,
+            approved: false
+        });
+
+    }
+
+    function setTransferWindowPeriod(uint256 _transferPeriod) external onlyOwner {
+        transferWindowPeriod = _transferPeriod;
+    }
+
+    function transferFrom(address _from, address _to, uint256 _tokenId) public override {
+        if(ownerOf(_tokenId) != address(this)) {
+            require(transferRequests[_tokenId].approved, "Transfer of token not approved");
+        }
+
+        return super.transferFrom(_from, _to, _tokenId);
     } 
 
     /// @notice Allows contract to receive NFTs

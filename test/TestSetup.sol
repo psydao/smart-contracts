@@ -16,10 +16,13 @@ contract TestSetup is Test {
     address alice = vm.addr(2);
     address bob = vm.addr(3);
 
+    uint256 ONE_DAY = 86400;
+
     function setUpTests() public {
         vm.startPrank(owner);
         psyNFT = new PsyNFT();
         auction = new Auction();
+        psyNFT.setTransferWindowPeriod(ONE_DAY);
         vm.stopPrank();
     }
 }
