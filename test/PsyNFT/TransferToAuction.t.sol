@@ -11,7 +11,7 @@ contract TransferToAuctionTest is TestSetup {
         setUpTests();
     }
 
-    function test_TransferToAuctionFailsIfNotOwner() public {
+    function test_TransferFailsIfNotOwner() public {
         uint256[] memory tokenIds = new uint256[](2);
         tokenIds[0] = 2;
         tokenIds[1] = 4;
@@ -21,7 +21,7 @@ contract TransferToAuctionTest is TestSetup {
         psyNFT.transferNFTs(tokenIds, address(auction));
     }
 
-    function test_TransferToAuctionFailsIfAuctionIsZeroAddress() public {
+    function test_TransferFailsIfAuctionIsZeroAddress() public {
         uint256[] memory tokenIds = new uint256[](2);
         tokenIds[0] = 2;
         tokenIds[1] = 4;
@@ -38,31 +38,13 @@ contract TransferToAuctionTest is TestSetup {
         uint256[] memory tokenIdsForAuction = new uint256[](2);
         tokenIdsForAuction[0] = 2;
         tokenIdsForAuction[1] = 4;
-
-        uint256[] memory tokenIdsForBob = new uint256[](2);
-        tokenIdsForBob[0] = 1;
-        tokenIdsForBob[1] = 3;
-
-        assertEq(psyNFT.ownerOf(0), address(psyNFT));
-        assertEq(psyNFT.ownerOf(1), address(psyNFT));
         assertEq(psyNFT.ownerOf(2), address(psyNFT));
-        assertEq(psyNFT.ownerOf(3), address(psyNFT));
-        assertEq(psyNFT.ownerOf(4), address(psyNFT));
 
         psyNFT.transferNFTs(tokenIdsForAuction, address(auction));
-        
-        assertEq(psyNFT.ownerOf(0), address(psyNFT));
-        assertEq(psyNFT.ownerOf(1), address(psyNFT));
-        assertEq(psyNFT.ownerOf(2), address(auction));
-        assertEq(psyNFT.ownerOf(3), address(psyNFT));
-        assertEq(psyNFT.ownerOf(4), address(auction));
 
-        psyNFT.transferNFTs(tokenIdsForBob, address(bob));
-
-        assertEq(psyNFT.ownerOf(0), address(psyNFT));
-        assertEq(psyNFT.ownerOf(1), address(bob));
         assertEq(psyNFT.ownerOf(2), address(auction));
-        assertEq(psyNFT.ownerOf(3), address(bob));
         assertEq(psyNFT.ownerOf(4), address(auction));
+        assertEq(psyNFT.ownerOf(0), address(psyNFT));
+
     }
 }

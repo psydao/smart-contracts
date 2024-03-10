@@ -6,6 +6,11 @@ import "openzeppelin-contracts/contracts/access/Ownable2Step.sol";
 import "forge-std/console.sol";
 
 contract PsyNFT is ERC721, Ownable2Step {
+    struct TransferRequest {
+        address from;
+        address to;
+        bool approved;
+    }
 
     uint256 public tokenId;
     uint256 public secondLastFibonacci;
@@ -13,7 +18,7 @@ contract PsyNFT is ERC721, Ownable2Step {
 
     bool public initialMintCalled;
 
-    mapping(uint256 => bool) public currentTokensBeingHeld;
+    mapping(uint256 => TransferRequest) public transferRequests;
 
     constructor() ERC721("PsyNFT", "PSY") Ownable(msg.sender) {
 
@@ -52,12 +57,17 @@ contract PsyNFT is ERC721, Ownable2Step {
         previousFibonacci = batchAmount;
     }
 
+
     function transferNFTs(uint256[] memory _tokenIds, address _recipient) external onlyOwner {
         require(_recipient != address(0), "Cannot be address 0");
         for(uint256 x; x < _tokenIds.length; x++) {
             _safeTransfer(address(this), _recipient, _tokenIds[x]);
         }
     }
+
+    function _update(address to, uint256 tokenIds, address auth) internal override returns (address) {
+        return super._update(to, tokenIds, auth);
+    } 
 
     /// @notice Allows contract to receive NFTs
     /// @dev Returns the valid selector to the ERC721 contract to prove contract can hold NFTs
