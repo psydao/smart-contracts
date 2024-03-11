@@ -62,6 +62,97 @@ contract TransferNFTsTest is TestSetup {
         psyNFT.transferNFTs(tokenIds, address(auction));
     }
 
+    function test_TransferFromUserFailsIfNotApproved() public {
+        vm.startPrank(owner);
+
+        psyNFT.initialMint();
+
+        uint256[] memory tokens = new uint256[](2);
+        tokens[0] = 2;
+        tokens[1] = 4;
+        psyNFT.transferNFTs(tokens, address(alice));
+        vm.stopPrank();
+
+        vm.prank(alice);
+        vm.expectRevert("Transfer of token not approved");
+        psyNFT.safeTransferFrom(address(alice), address(bob), 2);
+    }
+
+    function test_TransferFromUserFailsIfApprovalHasExpired() public {
+        uint256 TWO_DAYS = 172800;
+
+        vm.startPrank(owner);
+
+        psyNFT.initialMint();
+
+        uint256[] memory tokens = new uint256[](2);
+        tokens[0] = 2;
+        tokens[1] = 4;
+        psyNFT.transferNFTs(tokens, address(alice));
+        vm.stopPrank();
+
+        vm.prank(alice);
+        psyNFT.submitTransferRequest(address(bob), 2);
+
+        vm.prank(owner);
+        psyNFT.finalizeRequest(2, true);
+
+        vm.warp(TWO_DAYS);
+
+        vm.prank(alice);
+        vm.expectRevert("Request expired");
+        psyNFT.safeTransferFrom(address(alice), address(bob), 2);
+    }
+
+    function test_TransferFromUserFailsIfReceiversAreDifferent() public {
+        uint256 TWO_DAYS = 172800;
+
+        vm.startPrank(owner);
+
+        psyNFT.initialMint();
+
+        uint256[] memory tokens = new uint256[](2);
+        tokens[0] = 2;
+        tokens[1] = 4;
+        psyNFT.transferNFTs(tokens, address(alice));
+        vm.stopPrank();
+
+        vm.prank(alice);
+        psyNFT.submitTransferRequest(address(bob), 2);
+
+        vm.prank(owner);
+        psyNFT.finalizeRequest(2, true);
+
+        vm.prank(alice);
+        vm.expectRevert("Different receivers");
+        psyNFT.safeTransferFrom(address(alice), address(owner), 2);
+    }
+
+    function test_TransferWithApproval() public {
+        uint256 TWO_DAYS = 172800;
+
+        vm.startPrank(owner);
+
+        psyNFT.initialMint();
+
+        uint256[] memory tokens = new uint256[](2);
+        tokens[0] = 2;
+        tokens[1] = 4;
+        psyNFT.transferNFTs(tokens, address(alice));
+        vm.stopPrank();
+
+        vm.prank(alice);
+        psyNFT.submitTransferRequest(address(bob), 2);
+
+        vm.prank(owner);
+        psyNFT.finalizeRequest(2, true);
+
+        assertEq(psyNFT.ownerOf(2), address(alice));
+        vm.prank(alice);
+        psyNFT.safeTransferFrom(address(alice), address(bob), 2);
+        assertEq(psyNFT.ownerOf(2), address(bob));
+    }
+
     function test_TransferNfts() public {
         vm.startPrank(owner);
 

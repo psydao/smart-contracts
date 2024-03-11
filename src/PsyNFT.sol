@@ -104,6 +104,7 @@ contract PsyNFT is ERC721, Ownable2Step {
     function transferFrom(address _from, address _to, uint256 _tokenId) public override {
         if(ownerOf(_tokenId) != address(this)) {
             require(transferRequests[_tokenId].approved, "Transfer of token not approved");
+            require(_to == transferRequests[_tokenId].to, "Different receivers");
             require(block.timestamp <= transferRequests[_tokenId].requestEndTime, "Request expired");
         }
 
