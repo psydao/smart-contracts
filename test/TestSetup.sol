@@ -11,6 +11,8 @@ contract TestSetup is Test {
     error ERC721NonexistentToken(uint256 tokenId);
     error ERC721IncorrectOwner(address from, uint256 tokenId, address previousOwner);
 
+    event Transfer(address from, address to, uint256 tokenId);
+
     PsyNFT public psyNFT;
     Auction public auction;
 

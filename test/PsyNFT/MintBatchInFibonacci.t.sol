@@ -12,8 +12,17 @@ contract MintBatchInFibonacciTest is TestSetup {
     }
 
     function test_BatchMintFailsWhenNonOwner() public {
+        vm.prank(owner);
+        psyNFT.initialMint();
+
         vm.prank(alice);
         vm.expectRevert(abi.encodeWithSelector(OwnableUnauthorizedAccount.selector, address(alice)));
+        psyNFT.batchMintInFibonacci();
+    }
+
+    function test_BatchMintFailsIfInitialMintNotComplete() public {
+        vm.prank(owner);
+        vm.expectRevert("Initial mint not completed");
         psyNFT.batchMintInFibonacci();
     }
 
