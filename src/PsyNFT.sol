@@ -78,10 +78,11 @@ contract PsyNFT is ERC721, Ownable2Step {
     ) external {
         require(msg.sender == ownerOf(_tokenId), "Not token owner");
         require(block.timestamp > transferRequests[_tokenId].requestEndTime, "Transfer request currently active");
+        require(_to != address(0), "Cannot be address 0");
         
         transferRequests[_tokenId] = TransferRequest({
             tokenId: _tokenId,
-            requestEndTime: 1,
+            requestEndTime: block.timestamp + transferWindowPeriod,
             from: msg.sender,
             to: _to,
             approved: false
@@ -93,7 +94,6 @@ contract PsyNFT is ERC721, Ownable2Step {
         require(request.requestEndTime != 0, "Request non existent");
         require(block.timestamp <= request.requestEndTime, "Request expired");
 
-        request.requestEndTime = block.timestamp + transferWindowPeriod;
         request.approved = _decision;
     }
 
