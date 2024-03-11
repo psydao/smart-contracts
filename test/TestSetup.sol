@@ -8,6 +8,8 @@ import "../src/Auction.sol";
 contract TestSetup is Test {
 
     error OwnableUnauthorizedAccount(address account);
+    error ERC721NonexistentToken(uint256 tokenId);
+    error ERC721IncorrectOwner(address from, uint256 tokenId, address previousOwner);
 
     PsyNFT public psyNFT;
     Auction public auction;

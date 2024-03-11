@@ -5,7 +5,7 @@ import "../TestSetup.sol";
 import "../../src/PsyNFT.sol";
 
 
-contract BatchMintTest is TestSetup {
+contract MintBatchInFibonacciTest is TestSetup {
 
     function setUp() public {
         setUpTests();
@@ -14,7 +14,7 @@ contract BatchMintTest is TestSetup {
     function test_BatchMintFailsWhenNonOwner() public {
         vm.prank(alice);
         vm.expectRevert(abi.encodeWithSelector(OwnableUnauthorizedAccount.selector, address(alice)));
-        psyNFT.mintBatchInFibonacci();
+        psyNFT.batchMintInFibonacci();
     }
 
     function test_BatchMintWorks() public {
@@ -26,11 +26,11 @@ contract BatchMintTest is TestSetup {
         vm.startPrank(owner);
         
         psyNFT.initialMint();
-        psyNFT.mintBatchInFibonacci();
-        psyNFT.mintBatchInFibonacci();
-        psyNFT.mintBatchInFibonacci();
-        psyNFT.mintBatchInFibonacci();
-        psyNFT.mintBatchInFibonacci();
+        psyNFT.batchMintInFibonacci();
+        psyNFT.batchMintInFibonacci();
+        psyNFT.batchMintInFibonacci();
+        psyNFT.batchMintInFibonacci();
+        psyNFT.batchMintInFibonacci();
 
         assertEq(psyNFT.secondLastFibonacci(), 13);
         assertEq(psyNFT.previousFibonacci(), 21);

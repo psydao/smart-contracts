@@ -5,7 +5,7 @@ import "../TestSetup.sol";
 import "../../src/PsyNFT.sol";
 
 
-contract TransferToAuctionTest is TestSetup {
+contract TransferNFTsTest is TestSetup {
 
     function setUp() public {
         setUpTests();
@@ -21,7 +21,7 @@ contract TransferToAuctionTest is TestSetup {
         psyNFT.transferNFTs(tokenIds, address(auction));
     }
 
-    function test_TransferFailsIfAuctionIsZeroAddress() public {
+    function test_TransferFailsIfRecipientIsZeroAddress() public {
         uint256[] memory tokenIds = new uint256[](2);
         tokenIds[0] = 2;
         tokenIds[1] = 4;
@@ -29,6 +29,37 @@ contract TransferToAuctionTest is TestSetup {
         vm.prank(owner);
         vm.expectRevert("Cannot be address 0");
         psyNFT.transferNFTs(tokenIds, address(0));
+    }
+
+    function test_transferFailsIfTokenIdIsInvalid() public {
+        vm.startPrank(owner);
+
+        psyNFT.initialMint();
+
+        uint256[] memory tokenIds = new uint256[](2);
+        tokenIds[0] = 2;
+        tokenIds[1] = 6;
+
+        vm.expectRevert(abi.encodeWithSelector(ERC721NonexistentToken.selector, 6));
+        psyNFT.transferNFTs(tokenIds, address(auction));
+    }
+
+    function test_transferFailsIfTokenIdIsNotOwnedByContract() public {
+        vm.startPrank(owner);
+
+        psyNFT.initialMint();
+
+        uint256[] memory tokensForAlice = new uint[](1);
+        tokensForAlice[0] = 1;
+
+        psyNFT.transferNFTs(tokensForAlice, address(alice));
+
+        uint256[] memory tokenIds = new uint256[](2);
+        tokenIds[0] = 1;
+        tokenIds[1] = 4;
+
+        vm.expectRevert(abi.encodeWithSelector(ERC721IncorrectOwner.selector, address(psyNFT), 1, address(alice)));
+        psyNFT.transferNFTs(tokenIds, address(auction));
     }
 
     function test_TransferNfts() public {
@@ -41,10 +72,9 @@ contract TransferToAuctionTest is TestSetup {
         tokenIdsForAuction[1] = 4;
         assertEq(psyNFT.ownerOf(2), address(psyNFT));
         psyNFT.transferNFTs(tokenIdsForAuction, address(auction));
-
+        
+        assertEq(psyNFT.ownerOf(0), address(psyNFT));
         assertEq(psyNFT.ownerOf(2), address(auction));
         assertEq(psyNFT.ownerOf(4), address(auction));
-        assertEq(psyNFT.ownerOf(0), address(psyNFT));
-
     }
 }

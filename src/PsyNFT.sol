@@ -8,7 +8,7 @@ import "forge-std/console.sol";
 contract PsyNFT is ERC721, Ownable2Step {
     struct TransferRequest {
         uint256 tokenId;
-        uint256 expiryDate;
+        uint256 requestEndTime;
         address from;
         address to;
         bool approved;
@@ -45,7 +45,7 @@ contract PsyNFT is ERC721, Ownable2Step {
     
     /// @notice Mints new NFT's following the fibonacci sequence
     /// @dev Each batch amount follows the fibonacci sequence
-    function mintBatchInFibonacci() external onlyOwner {
+    function batchMintInFibonacci() external onlyOwner {
         uint256 batchAmount = secondLastFibonacci + previousFibonacci;
         uint256 localTokenId = tokenId;
 
@@ -76,16 +76,24 @@ contract PsyNFT is ERC721, Ownable2Step {
         uint256 _tokenId
     ) external {
         require(msg.sender == ownerOf(_tokenId), "Not token owner");
-        require(block.timestamp > transferRequests[_tokenId].expiryDate, "Transfer request currently active");
+        require(block.timestamp > transferRequests[_tokenId].requestEndTime, "Transfer request currently active");
         
         transferRequests[_tokenId] = TransferRequest({
             tokenId: _tokenId,
-            expiryDate: block.timestamp + transferWindowPeriod,
+            requestEndTime: 1,
             from: msg.sender,
             to: _to,
             approved: false
         });
+    }
 
+    function finalizeRequest(uint256 _tokenId, bool _decision) external onlyOwner {
+        TransferRequest memory request = transferRequests[_tokenId];
+        require(request.requestEndTime != 0, "Request non existent");
+        require(block.timestamp <= request.requestEndTime, "Request expired");
+
+        request.requestEndTime = block.timestamp + transferWindowPeriod;
+        request.approved = _decision;
     }
 
     function setTransferWindowPeriod(uint256 _transferPeriod) external onlyOwner {
@@ -95,6 +103,7 @@ contract PsyNFT is ERC721, Ownable2Step {
     function transferFrom(address _from, address _to, uint256 _tokenId) public override {
         if(ownerOf(_tokenId) != address(this)) {
             require(transferRequests[_tokenId].approved, "Transfer of token not approved");
+            require(block.timestamp <= transferRequests[_tokenId].requestEndTime, "Request expired");
         }
 
         return super.transferFrom(_from, _to, _tokenId);
