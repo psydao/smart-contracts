@@ -29,10 +29,6 @@ contract PsyNFT is ERC721, Ownable2Step {
      * @notice Initializes the contract by minting the initial tokens.
      * @dev Only the contract owner can call this function.
      * @dev This function can only be called once.
-     * @dev Mints 5 tokens and assigns them to the contract address.
-     * @dev Sets the `tokenId` to the value of the localTokenId after the loop.
-     * @dev Sets the `previousFibonacci` to 3.
-     * @dev Sets the `initialMintCalled` flag to true.
      */
     function initialMint() external onlyOwner {
         require(!initialMintCalled, "Initial mint completed");
@@ -49,15 +45,22 @@ contract PsyNFT is ERC721, Ownable2Step {
         previousFibonacci = 3;
     }
 
+    /**
+     * @notice Batch mints a specified number of tokens in a Fibonacci sequence.
+     * @dev Only the contract owner can call this function.
+     * @dev Requires that the initial mint has been completed.
+     * @dev The number of tokens to be minted is determined by the previous Fibonacci number.
+     */
     function batchMintInFibonacci() external onlyOwner {
         require(initialMintCalled, "Initial mint not completed");
 
         uint256 batchAmount = previousFibonacci;
         previousFibonacci = tokenId;
 
-        for (uint256 x; x < batchAmount; x++) {
+        while (batchAmount > 0) {
             _safeMint(address(this), tokenId);
             tokenId++;
+            batchAmount--;
         }
     }
 
