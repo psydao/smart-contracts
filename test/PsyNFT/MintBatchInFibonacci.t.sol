@@ -11,17 +11,16 @@ contract MintBatchInFibonacciTest is TestSetup {
         setUpTests();
     }
 
-    function test_BatchMintFailsWhenNonOwner() public {
-        vm.prank(owner);
+    function test_BatchMintFailsWhenNotCoreContract() public {
+        vm.startPrank(owner);
         psyNFT.initialMint();
 
-        vm.prank(alice);
-        vm.expectRevert(abi.encodeWithSelector(OwnableUnauthorizedAccount.selector, address(alice)));
+        vm.expectRevert("Only callable by Core.sol");
         psyNFT.batchMintInFibonacci();
     }
 
     function test_BatchMintFailsIfInitialMintNotComplete() public {
-        vm.prank(owner);
+        vm.prank(address(core));
         vm.expectRevert("Initial mint not completed");
         psyNFT.batchMintInFibonacci();
     }
@@ -31,9 +30,10 @@ contract MintBatchInFibonacciTest is TestSetup {
         assertEq(psyNFT.tokenId(), 0);
         assertEq(psyNFT.balanceOf(address(psyNFT)), 0);
        
-        vm.startPrank(owner);
-        
+        vm.prank(owner);
         psyNFT.initialMint();
+
+        vm.startPrank(address(core));
         psyNFT.batchMintInFibonacci();
         psyNFT.batchMintInFibonacci();
         psyNFT.batchMintInFibonacci();

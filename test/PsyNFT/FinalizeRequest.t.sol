@@ -62,7 +62,7 @@ contract FinalizeRequestTest is TestSetup {
     }
 
     function transferNftToUser(address _user, uint256[] memory _tokens) public {
-        vm.prank(owner);
+        vm.prank(address(core));
         psyNFT.transferNFTs(_tokens, _user);
     }
 

@@ -4,6 +4,7 @@ pragma solidity 0.8.20;
 import "forge-std/Test.sol";
 import "../src/PsyNFT.sol";
 import "../src/Auction.sol";
+import "../src/Core.sol";
 
 contract TestSetup is Test {
 
@@ -15,6 +16,7 @@ contract TestSetup is Test {
 
     PsyNFT public psyNFT;
     Auction public auction;
+    Core public core;
 
     address owner = vm.addr(1);
     address alice = vm.addr(2);
@@ -26,7 +28,9 @@ contract TestSetup is Test {
         vm.startPrank(owner);
         psyNFT = new PsyNFT();
         auction = new Auction();
+        core = new Core(address(psyNFT), address(auction));
         psyNFT.setTransferWindowPeriod(ONE_DAY);
+        psyNFT.setCoreContract(address(core));
         vm.stopPrank();
     }
 }

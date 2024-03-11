@@ -19,6 +19,8 @@ contract PsyNFT is ERC721, Ownable2Step {
     uint256 public previousFibonacci;
     uint256 public transferWindowPeriod;
 
+    address public core;
+
     bool public initialMintCalled;
 
     mapping(uint256 => TransferRequest) public transferRequests;
@@ -51,7 +53,8 @@ contract PsyNFT is ERC721, Ownable2Step {
      * @dev Requires that the initial mint has been completed.
      * @dev The number of tokens to be minted is determined by the previous Fibonacci number.
      */
-    function batchMintInFibonacci() external onlyOwner {
+    function batchMintInFibonacci() external {
+        require(msg.sender == address(core), "Only callable by Core.sol");
         require(initialMintCalled, "Initial mint not completed");
 
         uint256 batchAmount = previousFibonacci;
@@ -69,8 +72,8 @@ contract PsyNFT is ERC721, Ownable2Step {
      * @param _tokenIds An array of token IDs to be transferred.
      * @param _recipient The address of the recipient.
      */
-
-    function transferNFTs(uint256[] memory _tokenIds, address _recipient) external onlyOwner {
+    function transferNFTs(uint256[] memory _tokenIds, address _recipient) external {
+        require(msg.sender == address(core), "Only callable by Core.sol");
         require(_recipient != address(0), "Cannot be address 0");
         require(_tokenIds.length != 0, "No tokens to transfer");
         for (uint256 x; x < _tokenIds.length; x++) {
@@ -123,7 +126,11 @@ contract PsyNFT is ERC721, Ownable2Step {
     function setTransferWindowPeriod(uint256 _transferPeriod) external onlyOwner {
         transferWindowPeriod = _transferPeriod;
     }
-    
+
+    function setCoreContract(address _core) external onlyOwner {
+        core = _core;
+    }
+
     /**
      * @notice Transfers an NFT from one address to another.
      * @dev Overrides the transferFrom function in the ERC721 contract.

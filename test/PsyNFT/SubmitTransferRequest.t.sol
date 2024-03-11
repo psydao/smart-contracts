@@ -74,7 +74,7 @@ contract SubmitTransferRequestTest is TestSetup {
         tokens[1] = 2;
         tokens[2] = 3;
 
-        vm.prank(owner);
+        vm.prank(address(core));
         psyNFT.transferNFTs(tokens, _user);
     }
 }
