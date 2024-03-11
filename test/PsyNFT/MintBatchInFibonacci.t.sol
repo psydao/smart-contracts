@@ -1,0 +1,50 @@
+// SPDX-License-Identifier: MIT
+pragma solidity 0.8.20;
+
+import "../TestSetup.sol";
+import "../../src/PsyNFT.sol";
+
+
+contract MintBatchInFibonacciTest is TestSetup {
+
+    function setUp() public {
+        setUpTests();
+    }
+
+    function test_BatchMintFailsWhenNonOwner() public {
+        vm.prank(owner);
+        psyNFT.initialMint();
+
+        vm.prank(alice);
+        vm.expectRevert(abi.encodeWithSelector(OwnableUnauthorizedAccount.selector, address(alice)));
+        psyNFT.batchMintInFibonacci();
+    }
+
+    function test_BatchMintFailsIfInitialMintNotComplete() public {
+        vm.prank(owner);
+        vm.expectRevert("Initial mint not completed");
+        psyNFT.batchMintInFibonacci();
+    }
+
+    function test_BatchMintWorks() public {
+        assertEq(psyNFT.previousFibonacci(), 0);
+        assertEq(psyNFT.tokenId(), 0);
+        assertEq(psyNFT.balanceOf(address(psyNFT)), 0);
+       
+        vm.startPrank(owner);
+        
+        psyNFT.initialMint();
+        psyNFT.batchMintInFibonacci();
+        psyNFT.batchMintInFibonacci();
+        psyNFT.batchMintInFibonacci();
+        psyNFT.batchMintInFibonacci();
+        psyNFT.batchMintInFibonacci();
+
+        assertEq(psyNFT.previousFibonacci(), 34);
+        assertEq(psyNFT.tokenId(), 55);
+        assertEq(psyNFT.balanceOf(address(psyNFT)), 55);
+
+        vm.stopPrank();
+    }
+
+}
