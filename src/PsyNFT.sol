@@ -25,29 +25,36 @@ contract PsyNFT is ERC721, Ownable2Step {
 
     constructor() ERC721("PsyNFT", "PSY") Ownable(msg.sender) {}
 
-    /// @notice Mints the initial 5 NFT's for the founding members
-    /// @dev This is a unique function to begin the DAO and should only be called once
+    /**
+     * @notice Initializes the contract by minting the initial tokens.
+     * @dev Only the contract owner can call this function.
+     * @dev This function can only be called once.
+     * @dev Mints 5 tokens and assigns them to the contract address.
+     * @dev Sets the `tokenId` to the value of the localTokenId after the loop.
+     * @dev Sets the `previousFibonacci` to 3.
+     * @dev Sets the `initialMintCalled` flag to true.
+     */
     function initialMint() external onlyOwner {
         require(!initialMintCalled, "Initial mint completed");
+        initialMintCalled = true;
+
         uint256 localTokenId = 0;
 
-        for (localTokenId; localTokenId < 5; localTokenId++) {
+        while (localTokenId < 5) {
             _safeMint(address(this), localTokenId);
+            localTokenId++;
         }
 
         tokenId = localTokenId;
         previousFibonacci = 3;
-        initialMintCalled = true;
     }
 
-    /// @notice Mints new NFT's following the fibonacci sequence
-    /// @dev Each batch amount follows the fibonacci sequence
     function batchMintInFibonacci() external onlyOwner {
         require(initialMintCalled, "Initial mint not completed");
 
         uint256 batchAmount = previousFibonacci;
         previousFibonacci = tokenId;
-        
+
         for (uint256 x; x < batchAmount; x++) {
             _safeMint(address(this), tokenId);
             tokenId++;
