@@ -90,7 +90,7 @@ contract PsyNFT is ERC721, Ownable2Step {
     }
 
     function finalizeRequest(uint256 _tokenId, bool _decision) external onlyOwner {
-        TransferRequest memory request = transferRequests[_tokenId];
+        TransferRequest storage request = transferRequests[_tokenId];
         require(request.requestEndTime != 0, "Request non existent");
         require(block.timestamp <= request.requestEndTime, "Request expired");
 
