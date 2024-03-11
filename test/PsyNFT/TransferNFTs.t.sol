@@ -78,6 +78,30 @@ contract TransferNFTsTest is TestSetup {
         psyNFT.safeTransferFrom(address(alice), address(bob), 2);
     }
 
+    function test_TransferFromUserFailsIfDeclinedByOwner() public {
+        uint256 TWO_DAYS = 172800;
+
+        vm.startPrank(owner);
+
+        psyNFT.initialMint();
+
+        uint256[] memory tokens = new uint256[](2);
+        tokens[0] = 2;
+        tokens[1] = 4;
+        psyNFT.transferNFTs(tokens, address(alice));
+        vm.stopPrank();
+
+        vm.prank(alice);
+        psyNFT.submitTransferRequest(address(bob), 2);
+
+        vm.prank(owner);
+        psyNFT.finalizeRequest(2, false);
+
+        vm.prank(alice);
+        vm.expectRevert("Transfer of token not approved");
+        psyNFT.safeTransferFrom(address(alice), address(bob), 2);
+    }
+
     function test_TransferFromUserFailsIfApprovalHasExpired() public {
         uint256 TWO_DAYS = 172800;
 
