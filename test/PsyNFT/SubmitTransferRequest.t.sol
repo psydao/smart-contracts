@@ -2,8 +2,6 @@
 pragma solidity 0.8.20;
 
 import "../TestSetup.sol";
-import "../../src/PsyNFT.sol";
-
 
 contract SubmitTransferRequestTest is TestSetup {
 

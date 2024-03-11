@@ -28,11 +28,11 @@ contract Core is Ownable2Step {
         psyNFT.batchMintInFibonacci();
     }
 
-    function transferNftToAuction(uint256[] memory _tokenIds) external onlyOwner {
+    function transferNftsToAuction(uint256[] memory _tokenIds) external onlyOwner {
         _transfer(_tokenIds, auctionContract);
     }
 
-    function transferNftToUser(uint256[] memory _tokenIds, address _user) external onlyOwner {
+    function transferNftsToUser(uint256[] memory _tokenIds, address _user) external onlyOwner {
         _transfer(_tokenIds, _user);
     }
 
