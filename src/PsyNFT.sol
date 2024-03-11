@@ -63,9 +63,16 @@ contract PsyNFT is ERC721, Ownable2Step {
             batchAmount--;
         }
     }
+    /**
+     * @notice Transfers multiple NFTs to a specified recipient.
+     * @dev Only the contract owner can call this function.
+     * @param _tokenIds An array of token IDs to be transferred.
+     * @param _recipient The address of the recipient.
+     */
 
     function transferNFTs(uint256[] memory _tokenIds, address _recipient) external onlyOwner {
         require(_recipient != address(0), "Cannot be address 0");
+        require(_tokenIds.length != 0, "No tokens to transfer");
         for (uint256 x; x < _tokenIds.length; x++) {
             _safeTransfer(address(this), _recipient, _tokenIds[x]);
         }
@@ -78,6 +85,7 @@ contract PsyNFT is ERC721, Ownable2Step {
      * @param _tokenId The ID of the token to be transferred.
      */
     function submitTransferRequest(address _to, uint256 _tokenId) external {
+        require(_tokenId < tokenId, "Non existent token");
         require(msg.sender == ownerOf(_tokenId), "Not token owner");
         require(block.timestamp > transferRequests[_tokenId].requestEndTime, "Transfer request currently active");
         require(_to != address(0), "Cannot be address 0");
@@ -92,6 +100,7 @@ contract PsyNFT is ERC721, Ownable2Step {
     }
 
     function finalizeRequest(uint256 _tokenId, bool _decision) external onlyOwner {
+        require(_tokenId < tokenId, "Non existent token");
         TransferRequest storage request = transferRequests[_tokenId];
         require(request.requestEndTime != 0, "Request non existent");
         require(block.timestamp <= request.requestEndTime, "Request expired");

@@ -62,6 +62,17 @@ contract TransferNFTsTest is TestSetup {
         psyNFT.transferNFTs(tokenIds, address(auction));
     }
 
+    function test_TransferFromUserFailsIfNoTokensToTransfer() public {
+        vm.startPrank(owner);
+
+        psyNFT.initialMint();
+
+        uint256[] memory tokens = new uint256[](0);
+        vm.expectRevert("No tokens to transfer");
+        psyNFT.transferNFTs(tokens, address(alice));
+        vm.stopPrank();
+    }
+
     function test_TransferFromUserFailsIfNotApproved() public {
         vm.startPrank(owner);
 

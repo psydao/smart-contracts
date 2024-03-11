@@ -20,6 +20,13 @@ contract SubmitTransferRequestTest is TestSetup {
         psyNFT.submitTransferRequest(address(owner), 2);
     }
 
+    function test_SubmittingRequestFailsIfTokenDoesNotExist() public {
+        transferNftToUser(address(alice));        
+        vm.prank(alice);
+        vm.expectRevert("Non existent token");
+        psyNFT.submitTransferRequest(address(bob), 9);
+    }
+
     function test_SubmittingRequestFailsIfToAddressZero() public {
         transferNftToUser(address(alice));
         vm.prank(alice);
