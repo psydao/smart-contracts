@@ -98,6 +98,13 @@ contract PsyNFT is ERC721, Ownable2Step {
             approved: false
         });
     }
+    /**
+     * @notice Finalizes a transfer request for a specific token.
+     * @dev Only the contract owner can call this function.
+     * @param _tokenId The ID of the token for which the transfer request is being finalized.
+     * @param _decision The decision on whether to approve or reject the transfer request.
+     * @dev The token must exist and the transfer request must be active and not expired.
+     */
 
     function finalizeRequest(uint256 _tokenId, bool _decision) external onlyOwner {
         require(_tokenId < tokenId, "Non existent token");
@@ -107,11 +114,26 @@ contract PsyNFT is ERC721, Ownable2Step {
 
         request.approved = _decision;
     }
+    /**
+     * @notice Sets the transfer window period for transfer requests.
+     * @dev Only the contract owner can call this function.
+     * @param _transferPeriod The duration of the transfer window period in seconds.
+     */
 
     function setTransferWindowPeriod(uint256 _transferPeriod) external onlyOwner {
         transferWindowPeriod = _transferPeriod;
     }
-
+    
+    /**
+     * @notice Transfers an NFT from one address to another.
+     * @dev Overrides the transferFrom function in the ERC721 contract.
+     * @param _from The address from which the NFT is being transferred.
+     * @param _to The address to which the NFT is being transferred.
+     * @param _tokenId The ID of the NFT being transferred.
+     * @dev If the NFT is not owned by the contract, the transfer must be approved by the transfer request.
+     * @dev The recipient address must match the address specified in the transfer request.
+     * @dev The transfer request must not be expired.
+     */
     function transferFrom(address _from, address _to, uint256 _tokenId) public override {
         if (ownerOf(_tokenId) != address(this)) {
             require(transferRequests[_tokenId].approved, "Transfer of token not approved");
