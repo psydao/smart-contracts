@@ -15,7 +15,6 @@ contract PsyNFT is ERC721, Ownable2Step {
     }
 
     uint256 public tokenId;
-    uint256 public secondLastFibonacci;
     uint256 public previousFibonacci;
     uint256 public transferWindowPeriod;
 
@@ -122,12 +121,18 @@ contract PsyNFT is ERC721, Ownable2Step {
      * @dev Only the contract owner can call this function.
      * @param _transferPeriod The duration of the transfer window period in seconds.
      */
-
     function setTransferWindowPeriod(uint256 _transferPeriod) external onlyOwner {
         transferWindowPeriod = _transferPeriod;
     }
 
+    /**
+     * @notice Sets the address of the Core contract.
+     * @dev Only the contract owner can call this function.
+     * @param _core The address of the Core contract.
+     * @dev The address cannot be the zero address.
+     */
     function setCoreContract(address _core) external onlyOwner {
+        require(_core != address(0), "Cannot be address 0");
         core = _core;
     }
 
