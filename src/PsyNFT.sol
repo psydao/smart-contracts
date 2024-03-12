@@ -19,6 +19,7 @@ contract PsyNFT is ERC721, Ownable2Step {
     uint256 public transferWindowPeriod;
 
     address public core;
+    address public treasury;
 
     bool public initialMintCalled;
 
@@ -52,8 +53,7 @@ contract PsyNFT is ERC721, Ownable2Step {
      * @dev Requires that the initial mint has been completed.
      * @dev The number of tokens to be minted is determined by the previous Fibonacci number.
      */
-    function batchMintInFibonacci() external {
-        require(msg.sender == address(core), "Only callable by Core.sol");
+    function batchMintInFibonacci() external onlyCoreContract {
         require(initialMintCalled, "Initial mint not completed");
 
         uint256 batchAmount = previousFibonacci;
@@ -71,8 +71,7 @@ contract PsyNFT is ERC721, Ownable2Step {
      * @param _tokenIds An array of token IDs to be transferred.
      * @param _recipient The address of the recipient.
      */
-    function transferNFTs(uint256[] memory _tokenIds, address _recipient) external {
-        require(msg.sender == address(core), "Only callable by Core.sol");
+    function transferNFTs(uint256[] memory _tokenIds, address _recipient) external onlyCoreContract {
         require(_recipient != address(0), "Cannot be address 0");
         require(_tokenIds.length != 0, "No tokens to transfer");
         for (uint256 x; x < _tokenIds.length; x++) {
@@ -107,7 +106,6 @@ contract PsyNFT is ERC721, Ownable2Step {
      * @param _decision The decision on whether to approve or reject the transfer request.
      * @dev The token must exist and the transfer request must be active and not expired.
      */
-
     function finalizeRequest(uint256 _tokenId, bool _decision) external onlyOwner {
         require(_tokenId < tokenId, "Non existent token");
         TransferRequest storage request = transferRequests[_tokenId];
@@ -116,6 +114,7 @@ contract PsyNFT is ERC721, Ownable2Step {
 
         request.approved = _decision;
     }
+
     /**
      * @notice Sets the transfer window period for transfer requests.
      * @dev Only the contract owner can call this function.
@@ -136,6 +135,11 @@ contract PsyNFT is ERC721, Ownable2Step {
         core = _core;
     }
 
+    function setTreasury(address _treasury) external onlyOwner {
+        require(_treasury != address(0), "Cannot be address 0");
+        treasury = _treasury;
+    }
+
     /**
      * @notice Transfers an NFT from one address to another.
      * @dev Overrides the transferFrom function in the ERC721 contract.
@@ -147,7 +151,7 @@ contract PsyNFT is ERC721, Ownable2Step {
      * @dev The transfer request must not be expired.
      */
     function transferFrom(address _from, address _to, uint256 _tokenId) public override {
-        if (ownerOf(_tokenId) != address(this)) {
+        if (ownerOf(_tokenId) != address(this) && _to != address(treasury)) {
             require(transferRequests[_tokenId].approved, "Transfer of token not approved");
             require(_to == transferRequests[_tokenId].to, "Different receivers");
             require(block.timestamp <= transferRequests[_tokenId].requestEndTime, "Request expired");
@@ -160,5 +164,10 @@ contract PsyNFT is ERC721, Ownable2Step {
     /// @dev Returns the valid selector to the ERC721 contract to prove contract can hold NFTs
     function onERC721Received(address, address, uint256 _tokenId, bytes calldata) external returns (bytes4) {
         return IERC721Receiver.onERC721Received.selector;
+    }
+
+    modifier onlyCoreContract() {
+        require(msg.sender == address(core), "Only callable by Core.sol");
+        _;
     }
 }
