@@ -46,6 +46,9 @@ contract RageQuitTest is TestSetup {
         treasury.rageQuit(0, address(alice));
 
         assertEq(treasury.userBalances(address(alice)), treasuryPortion);
+
+        vm.prank(address(core));
+        treasury.rageQuit(0, address(alice));
     }
 
     function transferNftToUser(address _user, uint256[] memory _tokens) public {
