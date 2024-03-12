@@ -21,10 +21,11 @@ contract Treasury is Ownable2Step {
     function rageQuit(uint256 _tokenId, address _user) external {
         require(_user == psyNFT.ownerOf(_tokenId), "Not token owner");
         require(msg.sender == core, "Only callable by Core.sol");
-
-        psyNFT.safeTransferFrom(_user, address(this), _tokenId);
+        
         uint256 payout = _calculateProRataPayout();
         userBalances[_user] += payout;
+
+        psyNFT.burn(_tokenId);
     }
 
     /**
@@ -39,7 +40,8 @@ contract Treasury is Ownable2Step {
     }
 
     function _calculateProRataPayout() internal returns (uint256){
-        return balanceOfContract /  psyNFT.tokenId(); 
+        uint256 currentSupply = psyNFT.tokenId() - psyNFT.totalTokensBurnt();
+        return balanceOfContract /  currentSupply; 
     }
 
     /// @notice Allows contract to receive NFTs

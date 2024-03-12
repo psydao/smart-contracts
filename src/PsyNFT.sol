@@ -17,6 +17,7 @@ contract PsyNFT is ERC721, Ownable2Step {
     uint256 public tokenId;
     uint256 public previousFibonacci;
     uint256 public transferWindowPeriod;
+    uint256 public totalTokensBurnt;
 
     address public core;
     address public treasury;
@@ -159,6 +160,11 @@ contract PsyNFT is ERC721, Ownable2Step {
 
         return super.transferFrom(_from, _to, _tokenId);
     }
+
+    function burn(uint256 _tokenId) external {
+        totalTokensBurnt++;
+        _burn(_tokenId);
+    } 
 
     /// @notice Allows contract to receive NFTs
     /// @dev Returns the valid selector to the ERC721 contract to prove contract can hold NFTs

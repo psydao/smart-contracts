@@ -32,22 +32,19 @@ contract RageQuitTest is TestSetup {
 
     function test_RageQuitWorksPerfectly() public {
         vm.deal(address(alice), 10 ether);
-        vm.startPrank(alice);
+        vm.prank(alice);
         (bool sent, ) = address(treasury).call{value: 5 ether}("");
 
         assertEq(address(treasury).balance, 5 ether);
         assertEq(psyNFT.tokenId(), 5);
         uint256 aliceBalance = address(alice).balance;
 
-        psyNFT.approve(address(treasury), 0);
-        vm.stopPrank();
-
         assertEq(psyNFT.ownerOf(0), address(alice));
+        uint256 treasuryPortion = treasury.balanceOfContract() / psyNFT.tokenId();
+
         vm.prank(address(core));
         treasury.rageQuit(0, address(alice));
-        
-        assertEq(psyNFT.ownerOf(0), address(treasury));
-        uint256 treasuryPortion = 5 ether / psyNFT.tokenId();
+
         assertEq(treasury.userBalances(address(alice)), treasuryPortion);
     }
 
