@@ -10,6 +10,21 @@ contract WithdrawTokensTest is TestSetup {
         buyTokensForUsers();
     }
 
+    function test_FailsIfNotInWithdrawableStatus() public {
+        vm.prank(alice);
+        vm.expectRevert("PsyToken: Tokens Locked");
+        tokenSale.withdrawTokens();
+    }
+
+    function test_FailsIfUserHasNoPsyTokens() public {
+        vm.prank(owner);
+        tokenSale.unlockToken();
+
+        vm.prank(robyn);
+        vm.expectRevert("PsyToken: Insufficient funds");
+        tokenSale.withdrawTokens();
+    }
+
     function buyTokensForUsers() public {
         psyToken.mint(address(tokenSale), 100e18);
         usdc.mint(address(alice), 10e18);
