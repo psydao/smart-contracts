@@ -38,7 +38,7 @@ contract TokenSale is Ownable2Step, ReentrancyGuard {
      */
     function buyTokens(uint256 _amountOfPsyTokens) external nonReentrant {
         require(saleStatus == SaleStatus.OPEN, "PsyToken: Sale Paused");
-        require(_hasEnoughSupply(_amountOfPsyTokens), "PsyToken: Not enough supply");
+        require(_hasSufficientSupplyForPurchase(_amountOfPsyTokens), "PsyToken: Not enough supply");
 
         uint256 usdcAmount = (_amountOfPsyTokens * tokenPriceInUsdc) / 10e18;
         require(usdc.balanceOf(msg.sender) >= usdcAmount, "USDC: User has insufficient balance");
@@ -52,8 +52,11 @@ contract TokenSale is Ownable2Step, ReentrancyGuard {
 
         usdc.safeTransferFrom(msg.sender, address(this), usdcAmount);
     }
-
-    function withdrawTokens() external {
+    /**
+     * @notice Allows a user to withdraw their tokens.
+     * @dev The user must have a positive balance of tokens and the sale status must be set to WITHDRAWABLE.
+     */
+    function withdrawTokens() external nonReentrant {
         require(saleStatus == SaleStatus.WITHDRAWABLE, "PsyToken: Tokens Locked");
         require(userBalances[msg.sender] > 0, "PsyToken: Insufficient funds");
 
@@ -64,25 +67,29 @@ contract TokenSale is Ownable2Step, ReentrancyGuard {
     }
 
     function pauseSale() external onlyOwner {
-        require(saleStatus != SaleStatus.PAUSED, "PsyToken: Token Already Paused");
+        require(saleStatus == SaleStatus.OPEN, "PsyToken: Token Already Paused");
         saleStatus = SaleStatus.PAUSED;
     }
 
-    function unpauseSale() external onlyOwner {
+    function resumeSale() external onlyOwner {
         require(saleStatus == SaleStatus.PAUSED, "PsyToken: Token Not Paused");
+        require(supply > 0, "PsyToken: Supply Finished");
         saleStatus = SaleStatus.OPEN;
     }
 
     function unlockToken() external onlyOwner {
-        require(saleStatus != SaleStatus.WITHDRAWABLE, "PsyToken: Token Already Unlocked");
+        require(saleStatus == SaleStatus.PAUSED, "PsyToken: Token Not Paused");
         saleStatus = SaleStatus.WITHDRAWABLE;
     }
 
     function setSupply() external onlyOwner {
-        supply = psyToken.balanceOf(address(this));
+        uint256 newSupply = psyToken.balanceOf(address(this));
+        require(newSupply >= supply, "PsyToken: New supply cannot be less than total tokens sold");
+        supply = newSupply;
     }
 
-    function _hasEnoughSupply(uint256 _amount) internal view returns (bool) {
-        return (supply >= _amount) ? true : false;
+    function _hasSufficientSupplyForPurchase(uint256 _amount) internal view returns (bool) {
+        require(_amount > 0, "Amount Must Be Bigger Than 0");
+        return (supply >= _amount);
     }
 }
