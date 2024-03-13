@@ -4,6 +4,11 @@ pragma solidity 0.8.20;
 import "forge-std/Test.sol";
 import "../src/PsyNFT.sol";
 import "../src/Auction.sol";
+import "../src/TokenSale.sol";
+import "./TestPsyToken.sol";
+import "./TestUSDC.sol";
+
+
 
 contract TestSetup is Test {
 
@@ -15,6 +20,9 @@ contract TestSetup is Test {
 
     PsyNFT public psyNFT;
     Auction public auction;
+    TokenSale public tokenSale;
+    TestPsyToken public psyToken;
+    TestUSDC public usdc;
 
     address owner = vm.addr(1);
     address alice = vm.addr(2);
@@ -26,6 +34,9 @@ contract TestSetup is Test {
         vm.startPrank(owner);
         psyNFT = new PsyNFT();
         auction = new Auction();
+        psyToken = new TestPsyToken("TestPsy", "PSYT");
+        usdc = new TestUSDC("USDC Token", "USDC");
+        tokenSale = new TokenSale(address(psyToken), address(usdc));
         psyNFT.setTransferWindowPeriod(ONE_DAY);
         vm.stopPrank();
     }
