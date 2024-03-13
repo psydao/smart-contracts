@@ -11,7 +11,7 @@ contract BuyTokensTest is TestSetup {
         usdc.mint(address(alice), 10e18);
     }
 
-    function test_FailsIfAmountIsMoreThanSupply() public {
+    function test_FailsIfNotEnoughSupply() public {
         psyToken.mint(address(tokenSale), 1e18);
         vm.prank(owner);
         tokenSale.setSupply();
@@ -33,7 +33,7 @@ contract BuyTokensTest is TestSetup {
         tokenSale.buyTokens(1000e18);
     }
 
-    function test_FailsIfSaleIsClosed() public {
+    function test_FailsIfSaleIsPaused() public {
         psyToken.mint(address(tokenSale), 10e18);
         vm.startPrank(owner);
         tokenSale.setSupply();
@@ -71,7 +71,7 @@ contract BuyTokensTest is TestSetup {
         assertEq(psyToken.balanceOf(address(alice)), 0);
     }
 
-    function test_SaleClosesIfSupplyRunsOut() public {
+    function test_SalePausedIfSupplyRunsOut() public {
         psyToken.mint(address(tokenSale), 9e18);
 
         vm.prank(owner);

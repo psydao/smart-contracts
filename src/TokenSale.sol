@@ -3,10 +3,13 @@ pragma solidity 0.8.20;
 
 import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import "forge-std/console.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 import "openzeppelin-contracts/contracts/access/Ownable2Step.sol";
 
-contract TokenSale is Ownable2Step {
+contract TokenSale is Ownable2Step, ReentrancyGuard {
+    using SafeERC20 for IERC20;
 
     enum SaleStatus {
         OPEN,
@@ -29,19 +32,25 @@ contract TokenSale is Ownable2Step {
         usdc = IERC20(_usdc);
     }
 
-    function buyTokens(uint256 _amountOfPsyTokens) external {
+    /**
+     * @notice Allows users to buy a specified amount of PsyTokens.
+     * @param _amountOfPsyTokens The amount of PsyTokens to buy.
+     */
+    function buyTokens(uint256 _amountOfPsyTokens) external nonReentrant {
         require(saleStatus == SaleStatus.OPEN, "PsyToken: Sale Paused");
-        require(supply >= _amountOfPsyTokens, "PsyToken: Not enough supply");
+        require(_hasEnoughSupply(_amountOfPsyTokens), "PsyToken: Not enough supply");
+
         uint256 usdcAmount = (_amountOfPsyTokens * tokenPriceInUsdc) / 10e18;
         require(usdc.balanceOf(msg.sender) >= usdcAmount, "USDC: User has insufficient balance");
+
         userBalances[msg.sender] += _amountOfPsyTokens;
         supply -= _amountOfPsyTokens;
 
-        if(supply == 0) {
+        if (supply == 0) {
             saleStatus = SaleStatus.PAUSED;
         }
 
-        require(usdc.transferFrom(msg.sender, address(this), usdcAmount), "USDC: Transfer Failed");
+        usdc.safeTransferFrom(msg.sender, address(this), usdcAmount);
     }
 
     function withdrawTokens() external {
@@ -51,7 +60,7 @@ contract TokenSale is Ownable2Step {
         uint256 amount = userBalances[msg.sender];
         userBalances[msg.sender] = 0;
 
-        require(psyToken.transfer(msg.sender, amount), "Transfer failed");                                                         
+        psyToken.safeTransfer(msg.sender, amount);
     }
 
     function pauseSale() external onlyOwner {
@@ -71,5 +80,9 @@ contract TokenSale is Ownable2Step {
 
     function setSupply() external onlyOwner {
         supply = psyToken.balanceOf(address(this));
+    }
+
+    function _hasEnoughSupply(uint256 _amount) internal view returns (bool) {
+        return (supply >= _amount) ? true : false;
     }
 }
