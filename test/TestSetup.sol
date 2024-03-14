@@ -37,7 +37,7 @@ contract TestSetup is Test {
         auction = new Auction();
         psyToken = new TestPsyToken("TestPsy", "PSYT");
         usdc = new TestUSDC("USDC Token", "USDC");
-        tokenSale = new TokenSale(address(psyToken), address(usdc));
+        tokenSale = new TokenSale(address(psyToken), address(usdc), 10e17);
         psyNFT.setTransferWindowPeriod(ONE_DAY);
         vm.stopPrank();
     }

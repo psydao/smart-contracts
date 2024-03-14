@@ -9,6 +9,16 @@ contract TokenSaleDeploymentTest is TestSetup {
         setUpTests();
     }
 
+    function test_FailsIfPsyTokenIsAddressZero() public {
+        vm.expectRevert("Cannot be address 0");
+        TokenSale testTokenSale = new TokenSale(address(0), address(usdc), 10e17);
+    }
+
+    function test_FailsIfUSDCIsAddressZero() public {
+        vm.expectRevert("Cannot be address 0");
+        TokenSale testTokenSale = new TokenSale(address(psyToken), address(0), 10e17);
+    }
+
     function test_VariablesInitializedCorrectly() public {
         assertEq(address(tokenSale.psyToken()), address(psyToken));
         assertEq(address(tokenSale.usdc()), address(usdc));

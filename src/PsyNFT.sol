@@ -3,9 +3,11 @@ pragma solidity 0.8.20;
 
 import "openzeppelin-contracts/contracts/token/ERC721/ERC721.sol";
 import "openzeppelin-contracts/contracts/access/Ownable2Step.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+
 import "forge-std/console.sol";
 
-contract PsyNFT is ERC721, Ownable2Step {
+contract PsyNFT is ERC721, Ownable2Step, ReentrancyGuard {
     struct TransferRequest {
         uint256 tokenId;
         uint256 requestEndTime;
@@ -30,9 +32,11 @@ contract PsyNFT is ERC721, Ownable2Step {
      * @dev Only the contract owner can call this function.
      * @dev This function can only be called once.
      */
-    function initialMint() external onlyOwner {
+    function initialMint() external onlyOwner nonReentrant {
         require(!initialMintCalled, "Initial mint completed");
+        
         initialMintCalled = true;
+        previousFibonacci = 3;
 
         uint256 localTokenId = 0;
 
@@ -42,7 +46,6 @@ contract PsyNFT is ERC721, Ownable2Step {
         }
 
         tokenId = localTokenId;
-        previousFibonacci = 3;
     }
 
     /**
@@ -51,7 +54,7 @@ contract PsyNFT is ERC721, Ownable2Step {
      * @dev Requires that the initial mint has been completed.
      * @dev The number of tokens to be minted is determined by the previous Fibonacci number.
      */
-    function batchMintInFibonacci() external onlyOwner {
+    function batchMintInFibonacci() external onlyOwner nonReentrant {
         require(initialMintCalled, "Initial mint not completed");
 
         uint256 batchAmount = previousFibonacci;
