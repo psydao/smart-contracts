@@ -46,6 +46,17 @@ contract BuyTokensTest is TestSetup {
         tokenSale.buyTokens(10e18);
     }
 
+    function test_FailsIfPurchasingZeroTokens() public {
+        psyToken.mint(address(tokenSale), 10e18);
+        vm.prank(owner);
+        tokenSale.setSupply();
+
+        vm.startPrank(alice);
+        usdc.approve(address(tokenSale), 10e18);
+        vm.expectRevert("Amount Must Be Bigger Than 0");
+        tokenSale.buyTokens(0);
+    }
+
     function test_BuyTokensWorksCorrectly() public {
 
         assertEq(usdc.balanceOf(address(alice)), 10e18);
