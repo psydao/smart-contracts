@@ -6,9 +6,6 @@ import "../src/PsyNFT.sol";
 import "../src/Auction.sol";
 import "../src/TokenSale.sol";
 import "./TestPsyToken.sol";
-import "./TestUSDC.sol";
-
-
 
 contract TestSetup is Test {
 
@@ -22,7 +19,6 @@ contract TestSetup is Test {
     Auction public auction;
     TokenSale public tokenSale;
     TestPsyToken public psyToken;
-    TestUSDC public usdc;
 
     address owner = vm.addr(1);
     address alice = vm.addr(2);
@@ -35,9 +31,8 @@ contract TestSetup is Test {
         vm.startPrank(owner);
         psyNFT = new PsyNFT();
         auction = new Auction();
-        psyToken = new TestPsyToken("TestPsy", "PSYT");
-        usdc = new TestUSDC("USDC Token", "USDC");
-        tokenSale = new TokenSale(address(psyToken), address(usdc), 10e17);
+        psyToken = new TestPsyToken("TestPsy", "PSY");
+        tokenSale = new TokenSale(address(psyToken), 0.1 ether);
         psyNFT.setTransferWindowPeriod(ONE_DAY);
         vm.stopPrank();
     }
