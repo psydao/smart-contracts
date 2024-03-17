@@ -73,26 +73,7 @@ contract TransferNFTsTest is TestSetup {
         vm.stopPrank();
     }
 
-    function test_TransferFromUserFailsIfNotApproved() public {
-        vm.prank(owner);
-
-        psyNFT.initialMint();
-
-        uint256[] memory tokens = new uint256[](2);
-        tokens[0] = 2;
-        tokens[1] = 4;
-
-        vm.prank(address(core));
-        psyNFT.transferNFTs(tokens, address(alice));
-
-        vm.prank(alice);
-        vm.expectRevert("Transfer of token not approved");
-        psyNFT.safeTransferFrom(address(alice), address(bob), 2);
-    }
-
-    function test_TransferFromUserFailsIfDeclinedByOwner() public {
-        uint256 TWO_DAYS = 172800;
-
+    function test_FailsIfNoApprovalExists() public {
         vm.prank(owner);
         psyNFT.initialMint();
 
@@ -104,14 +85,8 @@ contract TransferNFTsTest is TestSetup {
         psyNFT.transferNFTs(tokens, address(alice));
 
         vm.prank(alice);
-        psyNFT.submitTransferRequest(address(bob), 2);
-
-        vm.prank(owner);
-        psyNFT.finalizeRequest(2, false);
-
-        vm.prank(alice);
-        vm.expectRevert("Transfer of token not approved");
-        psyNFT.safeTransferFrom(address(alice), address(bob), 2);
+        vm.expectRevert("PsyNFT: Approval Expired");
+        psyNFT.safeTransferFrom(address(alice), address(0), 2);
     }
 
     function test_TransferFromUserFailsIfApprovalHasExpired() public {
@@ -127,16 +102,13 @@ contract TransferNFTsTest is TestSetup {
         vm.prank(address(core));
         psyNFT.transferNFTs(tokens, address(alice));
 
-        vm.prank(alice);
-        psyNFT.submitTransferRequest(address(bob), 2);
-
         vm.prank(owner);
-        psyNFT.finalizeRequest(2, true);
+        psyNFT.approvePsyNftTransfer(2, address(bob), 86400);
 
         vm.warp(TWO_DAYS);
 
         vm.prank(alice);
-        vm.expectRevert("Request expired");
+        vm.expectRevert("PsyNFT: Approval Expired");
         psyNFT.safeTransferFrom(address(alice), address(bob), 2);
     }
 
@@ -153,14 +125,11 @@ contract TransferNFTsTest is TestSetup {
         vm.prank(address(core));
         psyNFT.transferNFTs(tokens, address(alice));
 
-        vm.prank(alice);
-        psyNFT.submitTransferRequest(address(bob), 2);
-
         vm.prank(owner);
-        psyNFT.finalizeRequest(2, true);
+        psyNFT.approvePsyNftTransfer(2, address(bob), 86400);
 
         vm.prank(alice);
-        vm.expectRevert("Different receivers");
+        vm.expectRevert("PsyNFT: Incorrect Receiver");
         psyNFT.safeTransferFrom(address(alice), address(owner), 2);
     }
 
@@ -177,11 +146,8 @@ contract TransferNFTsTest is TestSetup {
         vm.prank(address(core));
         psyNFT.transferNFTs(tokens, address(alice));
 
-        vm.prank(alice);
-        psyNFT.submitTransferRequest(address(bob), 2);
-
         vm.prank(owner);
-        psyNFT.finalizeRequest(2, true);
+        psyNFT.approvePsyNftTransfer(2, address(bob), 86400);
 
         assertEq(psyNFT.ownerOf(2), address(alice));
         vm.prank(alice);

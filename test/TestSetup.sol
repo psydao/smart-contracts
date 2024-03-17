@@ -39,7 +39,6 @@ contract TestSetup is Test {
         core = new Core(address(psyNFT), address(auction), address(treasury));
         psyToken = new TestPsyToken("TestPsy", "PSY");
         tokenSale = new TokenSale(address(psyToken), 0.1 ether);
-        psyNFT.setTransferWindowPeriod(ONE_DAY);
         psyNFT.setCoreContract(address(core));
         psyNFT.setTreasury(address(treasury));
         treasury.setCoreContract(address(core));

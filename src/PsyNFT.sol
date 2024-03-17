@@ -8,27 +8,28 @@ import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "forge-std/console.sol";
 
 contract PsyNFT is ERC721, Ownable2Step, ReentrancyGuard {
-    struct TransferRequest {
+    
+    struct ApprovedTransfers {
         uint256 tokenId;
-        uint256 requestEndTime;
-        address from;
         address to;
-        bool approved;
+        uint256 transferExpiryDate;
     }
 
     uint256 public tokenId;
     uint256 public previousFibonacci;
-    uint256 public transferWindowPeriod;
     uint256 public totalTokensBurnt;
 
     address public core;
     address public treasury;
 
     bool public initialMintCalled;
+    bool public controlledTransfers;
 
-    mapping(uint256 => TransferRequest) public transferRequests;
+    mapping(uint256 => ApprovedTransfers) public approvedTransfers;
 
-    constructor() ERC721("PsyNFT", "PSY") Ownable(msg.sender) {}
+    constructor() ERC721("PsyNFT", "PSY") Ownable(msg.sender) {
+        controlledTransfers = true;
+    }
 
     /**
      * @notice Initializes the contract by minting the initial tokens.
@@ -83,49 +84,20 @@ contract PsyNFT is ERC721, Ownable2Step, ReentrancyGuard {
         }
     }
 
-    /**
-     * @notice Submits a transfer request for a specific token to a given recipient.
-     * @dev The caller must be the owner of the token.
-     * @param _to The address of the recipient.
-     * @param _tokenId The ID of the token to be transferred.
-     */
-    function submitTransferRequest(address _to, uint256 _tokenId) external {
-        require(_tokenId < tokenId, "Non existent token");
-        require(msg.sender == ownerOf(_tokenId), "Not token owner");
-        require(block.timestamp > transferRequests[_tokenId].requestEndTime, "Transfer request currently active");
-        require(_to != address(0), "Cannot be address 0");
-
-        transferRequests[_tokenId] = TransferRequest({
+    function approvePsyNftTransfer(
+        uint256 _tokenId, 
+        address _to, 
+        uint256 _allowedTransferTimeInSeconds
+    ) external onlyOwner {
+        require(_tokenId < tokenId, "PsyNFT: Non Existent Token");
+        require(block.timestamp > approvedTransfers[_tokenId].transferExpiryDate, "PsyNFT: Transfer Request Currently Active");
+        require(_to != address(0), "PsyNFT: Cannot Approve Address Zero As Recipient");
+        
+        approvedTransfers[_tokenId] = ApprovedTransfers({
             tokenId: _tokenId,
-            requestEndTime: block.timestamp + transferWindowPeriod,
-            from: msg.sender,
-            to: _to,
-            approved: false
+            to: _to, 
+            transferExpiryDate: block.timestamp + _allowedTransferTimeInSeconds
         });
-    }
-    /**
-     * @notice Finalizes a transfer request for a specific token.
-     * @dev Only the contract owner can call this function.
-     * @param _tokenId The ID of the token for which the transfer request is being finalized.
-     * @param _decision The decision on whether to approve or reject the transfer request.
-     * @dev The token must exist and the transfer request must be active and not expired.
-     */
-    function finalizeRequest(uint256 _tokenId, bool _decision) external onlyOwner {
-        require(_tokenId < tokenId, "Non existent token");
-        TransferRequest storage request = transferRequests[_tokenId];
-        require(request.requestEndTime != 0, "Request non existent");
-        require(block.timestamp <= request.requestEndTime, "Request expired");
-
-        request.approved = _decision;
-    }
-
-    /**
-     * @notice Sets the transfer window period for transfer requests.
-     * @dev Only the contract owner can call this function.
-     * @param _transferPeriod The duration of the transfer window period in seconds.
-     */
-    function setTransferWindowPeriod(uint256 _transferPeriod) external onlyOwner {
-        transferWindowPeriod = _transferPeriod;
     }
 
     /**
@@ -155,10 +127,13 @@ contract PsyNFT is ERC721, Ownable2Step, ReentrancyGuard {
      * @dev The transfer request must not be expired.
      */
     function transferFrom(address _from, address _to, uint256 _tokenId) public override {
-        if (ownerOf(_tokenId) != address(this) && _to != address(treasury)) {
-            require(transferRequests[_tokenId].approved, "Transfer of token not approved");
-            require(_to == transferRequests[_tokenId].to, "Different receivers");
-            require(block.timestamp <= transferRequests[_tokenId].requestEndTime, "Request expired");
+        if (
+            controlledTransfers && 
+            ownerOf(_tokenId) != address(this) && 
+            _to != address(treasury)
+        ) {
+            require(_to == approvedTransfers[_tokenId].to, "PsyNFT: Incorrect Receiver");
+            require(block.timestamp <= approvedTransfers[_tokenId].transferExpiryDate, "PsyNFT: Approval Expired");
         }
 
         return super.transferFrom(_from, _to, _tokenId);

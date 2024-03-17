@@ -10,11 +10,10 @@ contract PsyNFTDeploymentTest is TestSetup {
     }
 
     function test_VariablesInitializedCorrectly() public {
-        vm.prank(owner);
-        PsyNFT psyNFTContract = new PsyNFT();
-
-        assertEq(psyNFTContract.name(), "PsyNFT");
-        assertEq(psyNFTContract.symbol(), "PSY");
-        assertEq(psyNFTContract.owner(), address(owner));
+        assertEq(psyNFT.name(), "PsyNFT");
+        assertEq(psyNFT.symbol(), "PSY");
+        assertEq(psyNFT.owner(), address(owner));
+        assertEq(psyNFT.initialMintCalled(), false);
+        assertEq(psyNFT.controlledTransfers(), true);
     }
 }
