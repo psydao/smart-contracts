@@ -83,10 +83,10 @@ contract BuyTokensTest is TestSetup {
         vm.prank(owner);
         tokenSale.setSupply();
 
-        assertEq(uint256(tokenSale.saleStatus()), 0);
+        assertEq(tokenSale.saleActive(), true);
 
         vm.startPrank(alice);
         tokenSale.buyTokens{value: 0.9 ether}(9);
-        assertEq(uint256(tokenSale.saleStatus()), 1);
+        assertEq(tokenSale.saleActive(), false);
     }
 }

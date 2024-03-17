@@ -17,5 +17,7 @@ contract TokenSaleDeploymentTest is TestSetup {
     function test_VariablesInitializedCorrectly() public {
         assertEq(address(tokenSale.psyToken()), address(psyToken));
         assertEq(tokenSale.tokenPriceInETH(), 0.1 ether);
+        assertEq(tokenSale.saleActive(), true);
+        assertEq(tokenSale.tokensLocked(), true);
     }
 }
