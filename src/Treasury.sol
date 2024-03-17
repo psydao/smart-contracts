@@ -11,6 +11,7 @@ contract Treasury is Ownable2Step {
 
     uint256 public balanceOfContract;
     address public core;
+    bool public rageQuitAllowed;
 
     mapping(address => uint256) public userBalances;
 
@@ -19,8 +20,9 @@ contract Treasury is Ownable2Step {
     }
 
     function rageQuit(uint256 _tokenId, address _user) external {
-        require(_user == psyNFT.ownerOf(_tokenId), "Not token owner");
-        require(msg.sender == core, "Only callable by Core.sol");
+        require(rageQuitAllowed, "Treasury: Rage Quit Disabled");
+        require(_user == psyNFT.ownerOf(_tokenId), "Treasury: Not token owner");
+        require(msg.sender == core, "Treasury: Only callable by Core.sol");
         
         uint256 payout = _calculateProRataPayout();
         userBalances[_user] += payout;
@@ -35,8 +37,18 @@ contract Treasury is Ownable2Step {
      * @dev The address cannot be the zero address.
      */
     function setCoreContract(address _core) external onlyOwner {
-        require(_core != address(0), "Cannot be address 0");
+        require(_core != address(0), "Treasury: Core Cannot Be Zero Address");
         core = _core;
+    }
+
+    function enableRageQuit() external onlyOwner {
+        require(!rageQuitAllowed, "Treasury: Rage Quit Already Enabled");
+        rageQuitAllowed = true;
+    }
+
+    function disableRageQuit() external onlyOwner {
+        require(rageQuitAllowed, "Treasury: Rage Quit Already Disabled");
+        rageQuitAllowed = false;
     }
 
     function _calculateProRataPayout() internal returns (uint256){

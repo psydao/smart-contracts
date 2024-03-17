@@ -8,8 +8,10 @@ contract RageQuitTest is TestSetup {
     function setUp() public {
         setUpTests();
 
-        vm.prank(owner);
+        vm.startPrank(owner);
         psyNFT.initialMint();
+        treasury.enableRageQuit();
+        vm.stopPrank();
 
         uint256[] memory tokensForAlice = new uint256[](3);
         tokensForAlice[0] = 0;
@@ -21,13 +23,22 @@ contract RageQuitTest is TestSetup {
 
     function test_FailsIfNotTokenOwner() public {
         vm.prank(address(core));
-        vm.expectRevert("Not token owner");
+        vm.expectRevert("Treasury: Not token owner");
         treasury.rageQuit(0, address(owner));
     }
 
     function test_FailsIfCallerIsNotCoreContract() public {
         vm.prank(owner);
-        vm.expectRevert("Only callable by Core.sol");
+        vm.expectRevert("Treasury: Only callable by Core.sol");
+        treasury.rageQuit(0, address(alice));
+    }
+
+    function test_FailsIfRageQuitIsDisabled() public {
+        vm.prank(owner);
+        treasury.disableRageQuit();
+
+        vm.prank(address(core));
+        vm.expectRevert("Treasury: Rage Quit Disabled");
         treasury.rageQuit(0, address(alice));
     }
 
