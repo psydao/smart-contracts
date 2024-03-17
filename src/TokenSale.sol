@@ -5,21 +5,15 @@ import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "openzeppelin-contracts/contracts/access/Ownable2Step.sol";
-import "forge-std/console.sol";
 
 contract TokenSale is Ownable2Step, ReentrancyGuard {
     using SafeERC20 for IERC20;
 
-    enum SaleStatus {
-        OPEN,
-        PAUSED,
-        WITHDRAWABLE
-    }
-
     uint256 public tokenPriceInETH;
     uint256 public supply;
 
-    SaleStatus public saleStatus;
+    bool public saleActive;
+    bool public tokensLocked;
 
     mapping(address => uint256) public userBalances;
 
@@ -30,6 +24,8 @@ contract TokenSale is Ownable2Step, ReentrancyGuard {
 
         psyToken = IERC20(_psyToken);
         tokenPriceInETH = _tokenPrice;
+        saleActive = true;
+        tokensLocked = true;
     }
 
     /**
@@ -37,7 +33,7 @@ contract TokenSale is Ownable2Step, ReentrancyGuard {
      * @param _amountOfPsyTokens The amount of PsyTokens to buy.
      */
     function buyTokens(uint256 _amountOfPsyTokens) external payable nonReentrant {
-        require(saleStatus == SaleStatus.OPEN, "PsyToken: Sale Paused");
+        require(saleActive, "PsyToken: Sale Paused");
         require(_amountOfPsyTokens > 0, "Amount Must Be Bigger Than 0");
         require(_hasSufficientSupplyForPurchase(_amountOfPsyTokens), "PsyToken: Not enough supply");
 
@@ -48,7 +44,7 @@ contract TokenSale is Ownable2Step, ReentrancyGuard {
         supply -= _amountOfPsyTokens;
 
         if (supply == 0) {
-            saleStatus = SaleStatus.PAUSED;
+            saleActive = false;
         }
     }
 
@@ -57,7 +53,7 @@ contract TokenSale is Ownable2Step, ReentrancyGuard {
      * @dev The user must have a positive balance of tokens and the sale status must be set to WITHDRAWABLE.
      */
     function withdrawTokens() external nonReentrant {
-        require(saleStatus == SaleStatus.WITHDRAWABLE, "PsyToken: Tokens Locked");
+        require(!tokensLocked, "PsyToken: Tokens Locked");
         require(userBalances[msg.sender] > 0, "PsyToken: Insufficient funds");
 
         uint256 amount = userBalances[msg.sender];
@@ -72,8 +68,8 @@ contract TokenSale is Ownable2Step, ReentrancyGuard {
      * @dev The sale status must be set to OPEN in order to pause it.
      */
     function pauseSale() external onlyOwner {
-        require(saleStatus == SaleStatus.OPEN, "PsyToken: Token Not Open");
-        saleStatus = SaleStatus.PAUSED;
+        require(saleActive, "PsyToken: Token Already Paused");
+        saleActive = false;
     }
 
     /**
@@ -82,9 +78,9 @@ contract TokenSale is Ownable2Step, ReentrancyGuard {
      * @dev The sale status must be set to PAUSED and the supply must be greater than 0 in order to resume the sale.
      */
     function resumeSale() external onlyOwner {
-        require(saleStatus == SaleStatus.PAUSED, "PsyToken: Token Not Paused");
+        require(!saleActive, "PsyToken: Token Not Paused");
         require(supply > 0, "PsyToken: Supply Finished");
-        saleStatus = SaleStatus.OPEN;
+        saleActive = true;
     }
 
     /**
@@ -93,8 +89,8 @@ contract TokenSale is Ownable2Step, ReentrancyGuard {
      * @dev The sale status must be set to PAUSED in order to unlock the token.
      */
     function unlockToken() external onlyOwner {
-        require(saleStatus == SaleStatus.PAUSED, "PsyToken: Token Not Paused");
-        saleStatus = SaleStatus.WITHDRAWABLE;
+        require(tokensLocked, "PsyToken: Tokens Already Unlocked");
+        tokensLocked = false;
     }
 
     /**

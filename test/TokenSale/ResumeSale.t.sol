@@ -41,11 +41,11 @@ contract ResumeSaleTest is TestSetup {
     function test_SaleSuccessfullyResumes() public {
         psyToken.mint(address(tokenSale), 10e18);
 
-        assertEq(uint256(tokenSale.saleStatus()), 0);
+        assertEq(tokenSale.saleActive(), true);
         vm.startPrank(owner);
         tokenSale.setSupply();
         tokenSale.pauseSale();
         tokenSale.resumeSale();
-        assertEq(uint256(tokenSale.saleStatus()), 0);
+        assertEq(tokenSale.saleActive(), true);
     }
 }

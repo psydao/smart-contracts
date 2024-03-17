@@ -18,17 +18,19 @@ contract UnlockTokenTest is TestSetup {
         tokenSale.unlockToken();
     }
 
-    function test_FailsIfSaleNotPaused() public {
+    function test_FailsIfTokenAlreadyUnlocked() public {
         vm.startPrank(owner);
-        vm.expectRevert("PsyToken: Token Not Paused");
+        tokenSale.unlockToken();
+
+        vm.expectRevert("PsyToken: Tokens Already Unlocked");
         tokenSale.unlockToken();
     }
 
-    function test_SaleSuccessfullyResumes() public {
-        assertEq(uint256(tokenSale.saleStatus()), 0);
+    function test_TokensUnLock() public {
+        assertEq(tokenSale.tokensLocked(), true);
         vm.startPrank(owner);
         tokenSale.pauseSale();
         tokenSale.unlockToken();
-        assertEq(uint256(tokenSale.saleStatus()), 2);
+        assertEq(tokenSale.tokensLocked(), false);
     }
 }

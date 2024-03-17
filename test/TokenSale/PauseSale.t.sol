@@ -19,14 +19,14 @@ contract PauseSaleTest is TestSetup {
         vm.startPrank(owner);
         tokenSale.pauseSale();
 
-        vm.expectRevert("PsyToken: Token Not Open");
+        vm.expectRevert("PsyToken: Token Already Paused");
         tokenSale.pauseSale();
     }
 
     function test_SaleSuccessfullyPauses() public {
-        assertEq(uint256(tokenSale.saleStatus()), 0);
+        assertEq(tokenSale.saleActive(), true);
         vm.startPrank(owner);
         tokenSale.pauseSale();
-        assertEq(uint256(tokenSale.saleStatus()), 1);
+        assertEq(tokenSale.saleActive(), false);
     }
 }
