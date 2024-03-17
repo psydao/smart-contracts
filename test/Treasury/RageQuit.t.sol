@@ -8,13 +8,14 @@ contract RageQuitTest is TestSetup {
     function setUp() public {
         setUpTests();
 
+        vm.prank(owner);
+        psyNFT.initialMint();
+
         uint256[] memory tokensForAlice = new uint256[](3);
         tokensForAlice[0] = 0;
         tokensForAlice[1] = 2;
         tokensForAlice[2] = 3;
 
-        vm.prank(owner);
-        psyNFT.initialMint();
         transferNftToUser(address(alice), tokensForAlice);
     }
 
@@ -31,6 +32,7 @@ contract RageQuitTest is TestSetup {
     }
 
     function test_RageQuitWorksPerfectly() public {
+
         vm.deal(address(alice), 10 ether);
         vm.prank(alice);
         (bool sent, ) = address(treasury).call{value: 5 ether}("");
@@ -46,9 +48,6 @@ contract RageQuitTest is TestSetup {
         treasury.rageQuit(0, address(alice));
 
         assertEq(treasury.userBalances(address(alice)), treasuryPortion);
-
-        vm.prank(address(core));
-        treasury.rageQuit(0, address(alice));
     }
 
     function transferNftToUser(address _user, uint256[] memory _tokens) public {

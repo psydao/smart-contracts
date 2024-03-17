@@ -6,6 +6,8 @@ import "../src/PsyNFT.sol";
 import "../src/Auction.sol";
 import "../src/Core.sol";
 import "../src/Treasury.sol";
+import "../src/TokenSale.sol";
+import "./TestPsyToken.sol";
 
 contract TestSetup is Test {
 
@@ -19,10 +21,13 @@ contract TestSetup is Test {
     Auction public auction;
     Core public core;
     Treasury public treasury;
+    TokenSale public tokenSale;
+    TestPsyToken public psyToken;
 
     address owner = vm.addr(1);
     address alice = vm.addr(2);
     address bob = vm.addr(3);
+    address robyn = vm.addr(4);
 
     uint256 ONE_DAY = 86400;
 
@@ -32,6 +37,8 @@ contract TestSetup is Test {
         auction = new Auction();
         treasury = new Treasury(address(psyNFT));
         core = new Core(address(psyNFT), address(auction), address(treasury));
+        psyToken = new TestPsyToken("TestPsy", "PSY");
+        tokenSale = new TokenSale(address(psyToken), 0.1 ether);
         psyNFT.setTransferWindowPeriod(ONE_DAY);
         psyNFT.setCoreContract(address(core));
         psyNFT.setTreasury(address(treasury));
