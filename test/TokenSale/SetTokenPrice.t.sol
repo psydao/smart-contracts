@@ -12,19 +12,19 @@ contract SetTokenPrice is TestSetup {
     function test_FailsIfNotOwner() public {
         vm.startPrank(alice);
         vm.expectRevert(abi.encodeWithSelector(OwnableUnauthorizedAccount.selector, address(alice)));
-        tokenSale.setTokenPrice(10e16);
+        tokenSale.setTokenPrice(0.01 ether);
     }
 
     function test_FailsIfNewPriceIsSameAsCurrentPrice() public {
         vm.startPrank(owner);
         vm.expectRevert("PsyToken: New Token Price Same As Current");
-        tokenSale.setTokenPrice(10e17);
+        tokenSale.setTokenPrice(0.1 ether);
     }
 
     function test_TokenPriceCorrectlyUpdates() public {
-        assertEq(tokenSale.tokenPriceInUsdc(), 10e17);
+        assertEq(tokenSale.tokenPriceInETH(), 0.1 ether);
         vm.startPrank(owner);
-        tokenSale.setTokenPrice(10e19);
-        assertEq(tokenSale.tokenPriceInUsdc(), 10e19);
+        tokenSale.setTokenPrice(10 ether);
+        assertEq(tokenSale.tokenPriceInETH(), 10 ether);
     }
 }

@@ -5,6 +5,7 @@ import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "openzeppelin-contracts/contracts/access/Ownable2Step.sol";
+import "forge-std/console.sol";
 
 contract TokenSale is Ownable2Step, ReentrancyGuard {
     using SafeERC20 for IERC20;
@@ -15,7 +16,7 @@ contract TokenSale is Ownable2Step, ReentrancyGuard {
         WITHDRAWABLE
     }
 
-    uint256 public tokenPriceInUsdc;
+    uint256 public tokenPriceInETH;
     uint256 public supply;
 
     SaleStatus public saleStatus;
@@ -23,28 +24,25 @@ contract TokenSale is Ownable2Step, ReentrancyGuard {
     mapping(address => uint256) public userBalances;
 
     IERC20 public immutable psyToken;
-    IERC20 public immutable usdc;
 
-    constructor(address _psyToken, address _usdc, uint256 _tokenPrice) Ownable(msg.sender) {
+    constructor(address _psyToken, uint256 _tokenPrice) Ownable(msg.sender) {
         require(_psyToken != address(0), "Cannot be address 0");
-        require(_usdc != address(0), "Cannot be address 0");
 
         psyToken = IERC20(_psyToken);
-        usdc = IERC20(_usdc);
-        tokenPriceInUsdc = _tokenPrice;
+        tokenPriceInETH = _tokenPrice;
     }
 
     /**
      * @notice Allows users to buy a specified amount of PsyTokens.
      * @param _amountOfPsyTokens The amount of PsyTokens to buy.
      */
-    function buyTokens(uint256 _amountOfPsyTokens) external nonReentrant {
+    function buyTokens(uint256 _amountOfPsyTokens) external payable nonReentrant {
         require(saleStatus == SaleStatus.OPEN, "PsyToken: Sale Paused");
         require(_amountOfPsyTokens > 0, "Amount Must Be Bigger Than 0");
         require(_hasSufficientSupplyForPurchase(_amountOfPsyTokens), "PsyToken: Not enough supply");
 
-        uint256 usdcAmount = (_amountOfPsyTokens * tokenPriceInUsdc) / 10e18;
-        require(usdc.balanceOf(msg.sender) >= usdcAmount, "USDC: User has insufficient balance");
+        uint256 ethAmount = _amountOfPsyTokens * tokenPriceInETH;
+        require(msg.value == ethAmount, "ETH: Incorrect Amount Sent In");
 
         userBalances[msg.sender] += _amountOfPsyTokens;
         supply -= _amountOfPsyTokens;
@@ -52,12 +50,10 @@ contract TokenSale is Ownable2Step, ReentrancyGuard {
         if (supply == 0) {
             saleStatus = SaleStatus.PAUSED;
         }
-
-        usdc.safeTransferFrom(msg.sender, address(this), usdcAmount);
     }
 
     /**
-     * @notice Allows a user to withdraw their tokens.
+     * @notice Allows a user to withdraw their PSY tokens.
      * @dev The user must have a positive balance of tokens and the sale status must be set to WITHDRAWABLE.
      */
     function withdrawTokens() external nonReentrant {
@@ -117,8 +113,8 @@ contract TokenSale is Ownable2Step, ReentrancyGuard {
      * @dev The new price must be different from the current token price.
      */
     function setTokenPrice(uint256 _newPrice) external onlyOwner {
-        require(_newPrice != tokenPriceInUsdc, "PsyToken: New Token Price Same As Current");
-        tokenPriceInUsdc = _newPrice;
+        require(_newPrice != tokenPriceInETH, "PsyToken: New Token Price Same As Current");
+        tokenPriceInETH = _newPrice;
     }
 
     /**

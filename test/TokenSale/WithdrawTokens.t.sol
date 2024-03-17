@@ -36,53 +36,50 @@ contract WithdrawTokensTest is TestSetup {
         assertEq(psyToken.balanceOf(address(alice)), 0);
         vm.prank(alice);
         tokenSale.withdrawTokens();
-        assertEq(psyToken.balanceOf(address(alice)), 10e18);
-        assertEq(psyToken.balanceOf(address(tokenSale)), 90e18);
+        assertEq(psyToken.balanceOf(address(alice)), 10);
+        assertEq(psyToken.balanceOf(address(tokenSale)), 90);
         assertEq(tokenSale.userBalances(address(alice)), 0);
 
         assertEq(psyToken.balanceOf(address(owner)), 0);
         vm.prank(owner);
         tokenSale.withdrawTokens();
-        assertEq(psyToken.balanceOf(address(owner)), 50e18);
-        assertEq(psyToken.balanceOf(address(tokenSale)), 40e18);
+        assertEq(psyToken.balanceOf(address(owner)), 50);
+        assertEq(psyToken.balanceOf(address(tokenSale)), 40);
         assertEq(tokenSale.userBalances(address(owner)), 0);
 
         assertEq(psyToken.balanceOf(address(bob)), 0);
         vm.prank(bob);
         tokenSale.withdrawTokens();
-        assertEq(psyToken.balanceOf(address(bob)), 15e18);
-        assertEq(psyToken.balanceOf(address(tokenSale)), 25e18);
+        assertEq(psyToken.balanceOf(address(bob)), 15);
+        assertEq(psyToken.balanceOf(address(tokenSale)), 25);
         assertEq(tokenSale.userBalances(address(bob)), 0);
     }
 
     function buyTokensForUsers() public {
-        psyToken.mint(address(tokenSale), 100e18);
-        usdc.mint(address(alice), 10e18);
-        usdc.mint(address(owner), 10e18);
-        usdc.mint(address(bob), 10e18);
+        psyToken.mint(address(tokenSale), 100);
+        vm.deal(alice, 100 ether);
+        vm.deal(bob, 100 ether);
+        vm.deal(owner, 100 ether);
 
         vm.prank(owner);
         tokenSale.setSupply();
 
         vm.startPrank(alice);
-        usdc.approve(address(tokenSale), 10e18);
-        tokenSale.buyTokens(10e18);
+        tokenSale.buyTokens{value: 1 ether}(10);
         vm.stopPrank();
 
         vm.startPrank(owner);
-        usdc.approve(address(tokenSale), 50e18);
-        tokenSale.buyTokens(50e18);
+        tokenSale.buyTokens{value: 5 ether}(50);
         vm.stopPrank();
 
         vm.startPrank(bob);
-        usdc.approve(address(tokenSale), 20e18);
-        tokenSale.buyTokens(15e18);
+        tokenSale.buyTokens{value: 1.5 ether}(15);
         vm.stopPrank();
 
-        assertEq(usdc.balanceOf(address(tokenSale)), 75e17);
-        assertEq(tokenSale.userBalances(address(alice)), 10e18);
-        assertEq(tokenSale.userBalances(address(owner)), 50e18);
-        assertEq(tokenSale.userBalances(address(bob)), 15e18);
-        assertEq(psyToken.balanceOf(address(tokenSale)), 100e18);
+        assertEq(address(tokenSale).balance, 7.5 ether);
+        assertEq(tokenSale.userBalances(address(alice)), 10);
+        assertEq(tokenSale.userBalances(address(owner)), 50);
+        assertEq(tokenSale.userBalances(address(bob)), 15);
+        assertEq(psyToken.balanceOf(address(tokenSale)), 100);
     }
 }
