@@ -111,6 +111,16 @@ contract PsyNFT is ERC721, Ownable2Step, ReentrancyGuard {
         core = _core;
     }
 
+    function disableControlledTransfers() external onlyOwner {
+        require(controlledTransfers, "PsyNFT: Controlled Transfers Already Disabled");
+        controlledTransfers = false;
+    }
+
+    function enableControlledTransfers() external onlyOwner {
+        require(!controlledTransfers, "PsyNFT: Controlled Transfers Already Enabled");
+        controlledTransfers = true;
+    }
+
     function setTreasury(address _treasury) external onlyOwner {
         require(_treasury != address(0), "Cannot be address 0");
         treasury = _treasury;

@@ -155,6 +155,28 @@ contract TransferNFTsTest is TestSetup {
         assertEq(psyNFT.ownerOf(2), address(bob));
     }
 
+    function test_TransferWhenControlledTranfserIsDisabled() public {
+        uint256 TWO_DAYS = 172800;
+
+        vm.prank(owner);
+        psyNFT.initialMint();
+
+        uint256[] memory tokens = new uint256[](2);
+        tokens[0] = 2;
+        tokens[1] = 4;
+
+        vm.prank(address(core));
+        psyNFT.transferNFTs(tokens, address(alice));
+
+        vm.prank(owner);
+        psyNFT.disableControlledTransfers();
+
+        assertEq(psyNFT.ownerOf(2), address(alice));
+        vm.prank(alice);
+        psyNFT.safeTransferFrom(address(alice), address(bob), 2);
+        assertEq(psyNFT.ownerOf(2), address(bob));
+    }
+
     function test_TransferNfts() public {
         vm.prank(owner);
         psyNFT.initialMint();
