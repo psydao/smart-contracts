@@ -24,13 +24,6 @@ contract ApprovePsyNftTransferTest is TestSetup {
         psyNFT.approvePsyNftTransfer(9, address(owner), 400);
     }
 
-    function test_FailsIfToAddressZero() public {
-        transferNftToUser(address(alice));
-        vm.prank(owner);
-        vm.expectRevert("PsyNFT: Cannot Approve Address Zero As Recipient");
-        psyNFT.approvePsyNftTransfer(3, address(0), 400);
-    }
-
     function test_FailsIfApprovalAlreadyExists() public {
         transferNftToUser(address(alice));
         vm.startPrank(owner);

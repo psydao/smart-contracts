@@ -5,10 +5,7 @@ import "openzeppelin-contracts/contracts/token/ERC721/ERC721.sol";
 import "openzeppelin-contracts/contracts/access/Ownable2Step.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
-import "forge-std/console.sol";
-
 contract PsyNFT is ERC721, Ownable2Step, ReentrancyGuard {
-    
     struct ApprovedTransfers {
         uint256 tokenId;
         address to;
@@ -38,7 +35,7 @@ contract PsyNFT is ERC721, Ownable2Step, ReentrancyGuard {
      */
     function initialMint() external onlyOwner nonReentrant {
         require(!initialMintCalled, "Initial mint completed");
-        
+
         initialMintCalled = true;
         previousFibonacci = 3;
 
@@ -76,6 +73,7 @@ contract PsyNFT is ERC721, Ownable2Step, ReentrancyGuard {
      * @param _tokenIds An array of token IDs to be transferred.
      * @param _recipient The address of the recipient.
      */
+
     function transferNFTs(uint256[] memory _tokenIds, address _recipient) external onlyCoreContract {
         require(_recipient != address(0), "Cannot be address 0");
         require(_tokenIds.length != 0, "No tokens to transfer");
@@ -84,18 +82,27 @@ contract PsyNFT is ERC721, Ownable2Step, ReentrancyGuard {
         }
     }
 
-    function approvePsyNftTransfer(
-        uint256 _tokenId, 
-        address _to, 
-        uint256 _allowedTransferTimeInSeconds
-    ) external onlyOwner {
+    /**
+     * @notice Approves the transfer of a PsyNFT token to a specified recipient.
+     * @dev Only the contract owner can call this function.
+     * @dev Cann approve address(0) for the purpose of burning.
+     * @param _tokenId The ID of the PsyNFT token to be transferred.
+     * @param _to The address of the recipient.
+     * @param _allowedTransferTimeInSeconds The duration in seconds for which the transfer is allowed.
+     */
+    function approvePsyNftTransfer(uint256 _tokenId, address _to, uint256 _allowedTransferTimeInSeconds)
+        external
+        onlyOwner
+    {
         require(_tokenId < tokenId, "PsyNFT: Non Existent Token");
-        require(block.timestamp > approvedTransfers[_tokenId].transferExpiryDate, "PsyNFT: Transfer Request Currently Active");
-        require(_to != address(0), "PsyNFT: Cannot Approve Address Zero As Recipient");
-        
+        require(
+            block.timestamp > approvedTransfers[_tokenId].transferExpiryDate,
+            "PsyNFT: Transfer Request Currently Active"
+        );
+
         approvedTransfers[_tokenId] = ApprovedTransfers({
             tokenId: _tokenId,
-            to: _to, 
+            to: _to,
             transferExpiryDate: block.timestamp + _allowedTransferTimeInSeconds
         });
     }
@@ -111,16 +118,31 @@ contract PsyNFT is ERC721, Ownable2Step, ReentrancyGuard {
         core = _core;
     }
 
+    /**
+     * @notice Disables controlled transfers of PsyNFT tokens.
+     * @dev Only the contract owner can call this function.
+     * @dev Requires that controlled transfers are currently enabled.
+     */
     function disableControlledTransfers() external onlyOwner {
         require(controlledTransfers, "PsyNFT: Controlled Transfers Already Disabled");
         controlledTransfers = false;
     }
 
+    /**
+     * @notice Enables controlled transfers of PsyNFT tokens.
+     * @dev Only the contract owner can call this function.
+     * @dev Requires that controlled transfers are currently disabled.
+     */
     function enableControlledTransfers() external onlyOwner {
         require(!controlledTransfers, "PsyNFT: Controlled Transfers Already Enabled");
         controlledTransfers = true;
     }
 
+    /**
+     * @notice Sets the address of the treasury.
+     * @dev Only the contract owner can call this function.
+     * @param _treasury The address of the treasury.
+     */
     function setTreasury(address _treasury) external onlyOwner {
         require(_treasury != address(0), "Cannot be address 0");
         treasury = _treasury;
@@ -137,11 +159,7 @@ contract PsyNFT is ERC721, Ownable2Step, ReentrancyGuard {
      * @dev The transfer request must not be expired.
      */
     function transferFrom(address _from, address _to, uint256 _tokenId) public override {
-        if (
-            controlledTransfers && 
-            ownerOf(_tokenId) != address(this) && 
-            _to != address(treasury)
-        ) {
+        if (controlledTransfers && ownerOf(_tokenId) != address(this) && _to != address(treasury)) {
             require(_to == approvedTransfers[_tokenId].to, "PsyNFT: Incorrect Receiver");
             require(block.timestamp <= approvedTransfers[_tokenId].transferExpiryDate, "PsyNFT: Approval Expired");
         }
@@ -149,10 +167,17 @@ contract PsyNFT is ERC721, Ownable2Step, ReentrancyGuard {
         return super.transferFrom(_from, _to, _tokenId);
     }
 
+    /**
+     * @notice Burns a PsyNFT token.
+     * @dev Only the treasury address can call this function.
+     * @dev Psy admin must approve the transfer to address(0).
+     * @param _tokenId The ID of the PsyNFT token to be burned.
+     */
     function burn(uint256 _tokenId) external {
+        require(msg.sender == treasury, "PsyNFT: Caller Is Not Treasury");
         totalTokensBurnt++;
         _burn(_tokenId);
-    } 
+    }
 
     /// @notice Allows contract to receive NFTs
     /// @dev Returns the valid selector to the ERC721 contract to prove contract can hold NFTs
