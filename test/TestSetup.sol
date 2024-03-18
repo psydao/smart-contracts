@@ -4,6 +4,8 @@ pragma solidity 0.8.20;
 import "forge-std/Test.sol";
 import "../src/PsyNFT.sol";
 import "../src/Auction.sol";
+import "../src/Core.sol";
+import "../src/Treasury.sol";
 import "../src/TokenSale.sol";
 import "./TestPsyToken.sol";
 
@@ -17,6 +19,8 @@ contract TestSetup is Test {
 
     PsyNFT public psyNFT;
     Auction public auction;
+    Core public core;
+    Treasury public treasury;
     TokenSale public tokenSale;
     TestPsyToken public psyToken;
 
@@ -31,9 +35,13 @@ contract TestSetup is Test {
         vm.startPrank(owner);
         psyNFT = new PsyNFT();
         auction = new Auction();
+        treasury = new Treasury(address(psyNFT));
+        core = new Core(address(psyNFT), address(auction), address(treasury));
         psyToken = new TestPsyToken("TestPsy", "PSY");
         tokenSale = new TokenSale(address(psyToken), 0.1 ether);
-        psyNFT.setTransferWindowPeriod(ONE_DAY);
+        psyNFT.setCoreContract(address(core));
+        psyNFT.setTreasury(address(treasury));
+        treasury.setCoreContract(address(core));
         vm.stopPrank();
     }
 }
