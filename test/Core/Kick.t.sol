@@ -3,15 +3,13 @@ pragma solidity 0.8.20;
 
 import "../TestSetup.sol";
 
-contract RageQuitTest is TestSetup {
+contract KickTest is TestSetup {
 
     function setUp() public {
         setUpTests();
 
-        vm.startPrank(owner);
+        vm.prank(owner);
         psyNFT.initialMint();
-        treasury.enableRageQuit();
-        vm.stopPrank();
 
         uint256[] memory tokensForAlice = new uint256[](3);
         tokensForAlice[0] = 0;
@@ -21,29 +19,13 @@ contract RageQuitTest is TestSetup {
         transferNftToUser(address(alice), tokensForAlice);
     }
 
-    function test_FailsIfNotTokenOwner() public {
-        vm.prank(address(core));
-        vm.expectRevert("Treasury: Not token owner");
-        treasury.rageQuit(0, address(owner));
+    function test_FailsIfCallerIsNotContractOwner() public {
+        vm.prank(address(alice));
+        vm.expectRevert(abi.encodeWithSelector(OwnableUnauthorizedAccount.selector, address(alice)));
+        core.kick(0, address(alice));
     }
 
-    function test_FailsIfCallerIsNotCoreContract() public {
-        vm.prank(owner);
-        vm.expectRevert("Treasury: Only callable by Core.sol");
-        treasury.rageQuit(0, address(alice));
-    }
-
-    function test_FailsIfRageQuitIsDisabled() public {
-        vm.prank(owner);
-        treasury.disableRageQuit();
-
-        vm.prank(address(core));
-        vm.expectRevert("Treasury: Rage Quit Disabled");
-        treasury.rageQuit(0, address(alice));
-    }
-
-    function test_RageQuitWorksPerfectly() public {
-
+    function test_KickWorks() public {
         vm.deal(address(alice), 10 ether);
         vm.prank(alice);
         (bool sent, ) = address(treasury).call{value: 5 ether}("");
@@ -55,8 +37,8 @@ contract RageQuitTest is TestSetup {
         assertEq(psyNFT.ownerOf(0), address(alice));
         uint256 treasuryPortion = treasury.balanceOfContract() / psyNFT.tokenId();
 
-        vm.prank(address(core));
-        treasury.rageQuit(0, address(alice));
+        vm.prank(address(owner));
+        core.kick(0, address(alice));
 
         assertEq(treasury.userBalances(address(alice)), treasuryPortion);
     }

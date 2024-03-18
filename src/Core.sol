@@ -11,6 +11,7 @@ contract Core is Ownable2Step {
     PsyNFT public psyNFT;
     Treasury public treasury;
     address public auctionContract;
+    bool public rageQuitAllowed;
 
     mapping(uint256 => address) public batchToAuctionAddress;
 
@@ -40,11 +41,29 @@ contract Core is Ownable2Step {
         _transfer(_tokenIds, _user);
     }
 
+    function enableRageQuit() external onlyOwner {
+        require(!rageQuitAllowed, "Treasury: Rage Quit Already Enabled");
+        rageQuitAllowed = true;
+    }
+
+    function disableRageQuit() external onlyOwner {
+        require(rageQuitAllowed, "Treasury: Rage Quit Already Disabled");
+        rageQuitAllowed = false;
+    }
+
+    function rageQuit(uint256 _tokenId) external {
+        require(rageQuitAllowed, "Treasury: Rage Quit Disabled");
+        treasury.exit(_tokenId, msg.sender);
+    }
+
+    function kick(uint256 _tokenId, address _user) external onlyOwner {
+        treasury.exit(_tokenId, _user);
+    }
+
     function _transfer(uint256[] memory _tokenIds, address _user) internal {
         psyNFT.transferNFTs(_tokenIds, _user);
     }
     
-    function rageQuit(uint256 _tokenId) external {
-        treasury.rageQuit(_tokenId, msg.sender);
-    }
+    
+
 }
