@@ -7,7 +7,6 @@ import "./Auction.sol";
 import "./Treasury.sol";
 
 contract Core is Ownable2Step {
-
     PsyNFT public psyNFT;
     Treasury public treasury;
     address public auctionContract;
@@ -15,11 +14,7 @@ contract Core is Ownable2Step {
 
     mapping(uint256 => address) public batchToAuctionAddress;
 
-    constructor(
-        address _psyNFT,
-        address _auction,
-        address _treasury
-    ) Ownable(msg.sender) {
+    constructor(address _psyNFT, address _auction, address _treasury) Ownable(msg.sender) {
         require(_psyNFT != address(0), "Cannot be address 0");
         require(_auction != address(0), "Cannot be address 0");
         require(_treasury != address(0), "Cannot be address 0");
@@ -29,11 +24,24 @@ contract Core is Ownable2Step {
         auctionContract = _auction;
     }
 
+    /**
+     * @notice Enables the ability for users to perform a rage quit.
+     * @dev This function can only be called by the contract owner.
+     * @dev The rage quit functionality allows users to exit the specified token ID from the treasury.
+     * @dev Once enabled, users can call the `rageQuit` function to perform a rage quit.
+     * @dev If rage quit is already enabled, this function will revert.
+     */
     function enableRageQuit() external onlyOwner {
         require(!rageQuitAllowed, "Treasury: Rage Quit Already Enabled");
         rageQuitAllowed = true;
     }
 
+    /**
+     * @notice Disables the ability for users to perform a rage quit.
+     * @dev This function can only be called by the contract owner.
+     * @dev Once disabled, users will no longer be able to call the `rageQuit` function.
+     * @dev If rage quit is already disabled, this function will revert.
+     */
     function disableRageQuit() external onlyOwner {
         require(rageQuitAllowed, "Treasury: Rage Quit Already Disabled");
         rageQuitAllowed = false;
@@ -43,38 +51,82 @@ contract Core is Ownable2Step {
     // -----------------------------------------------> PSY NFT FUNCTIONS <------------------------------------------------
     // --------------------------------------------------------------------------------------------------------------------
 
+    /**
+     * @notice Mints the initial batch of Psy NFTs.
+     * @dev This function can only be called by the contract owner.
+     */
+    function mintInitialBatch() external onlyOwner {
+        psyNFT.initialMint();
+    }
+
+    /**
+     * @notice Mints the next batch of Psy NFTs using the Fibonacci sequence.
+     * @dev This function can only be called by the contract owner.
+     */
     function mintNextBatch() external onlyOwner {
         psyNFT.batchMintInFibonacci();
     }
 
+    /**
+     * @notice Transfers the specified Psy NFTs to the auction contract.
+     * @dev This function can only be called by the contract owner.
+     * @param _tokenIds An array of token IDs to be transferred.
+     */
     function transferNftsToAuction(uint256[] memory _tokenIds) external onlyOwner {
         _transfer(_tokenIds, auctionContract);
     }
 
+    /**
+     * @notice Transfers the specified Psy NFTs to the specified user.
+     * @dev This function can only be called by the contract owner.
+     * @param _tokenIds An array of token IDs to be transferred.
+     * @param _user The address of the user to whom the NFTs will be transferred.
+     */
     function transferNftsToUser(uint256[] memory _tokenIds, address _user) external onlyOwner {
         _transfer(_tokenIds, _user);
+    }
+
+    /**
+     * @notice Approves the transfer of a Psy NFT to a specified address.
+     * @dev This function can only be called by the contract owner.
+     * @param _tokenId The ID of the Psy NFT to be transferred.
+     * @param _to The address to which the Psy NFT will be transferred.
+     * @param _allowedTransferTimeInSeconds The allowed transfer time in seconds for the approved transfer.
+     */
+    function approveNftTransfer(uint256 _tokenId, address _to, uint256 _allowedTransferTimeInSeconds)
+        external
+        onlyOwner
+    {
+        psyNFT.approveTransfer(_tokenId, _to, _allowedTransferTimeInSeconds);
     }
 
     // --------------------------------------------------------------------------------------------------------------------
     // --------------------------------------------> TOKEN SALE FUNCTIONS <------------------------------------------------
     // --------------------------------------------------------------------------------------------------------------------
 
-    
-
-    
     // --------------------------------------------------------------------------------------------------------------------
     // ----------------------------------------------> TREASURY FUNCTIONS <------------------------------------------------
     // --------------------------------------------------------------------------------------------------------------------
 
+    /**
+     * @notice Allows a user to rage quit by exiting the specified token ID from the treasury.
+     * @dev This function can only be called externally.
+     * @param _tokenId The ID of the token to be burned.
+     */
     function rageQuit(uint256 _tokenId) external {
         require(rageQuitAllowed, "Treasury: Rage Quit Disabled");
         treasury.exit(_tokenId, msg.sender);
     }
 
+    /**
+     * @notice Allows the contract owner to forcefully exit a token from the treasury.
+     * @dev This function can only be called by the contract owner.
+     * @param _tokenId The ID of the token to be forcefully exited.
+     * @param _user The address of the user whose token will be forcefully exited.
+     */
     function kick(uint256 _tokenId, address _user) external onlyOwner {
         treasury.exit(_tokenId, _user);
     }
-    
 
     // --------------------------------------------------------------------------------------------------------------------
     // ----------------------------------------------> INTERNAL FUNCTIONS <------------------------------------------------
@@ -83,6 +135,4 @@ contract Core is Ownable2Step {
     function _transfer(uint256[] memory _tokenIds, address _user) internal {
         psyNFT.transferNFTs(_tokenIds, _user);
     }
-    
-
 }

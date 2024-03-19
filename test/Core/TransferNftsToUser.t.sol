@@ -23,7 +23,7 @@ contract TransferNftsToAuctionTest is TestSetup {
 
     function test_TransferToUser() public {
         vm.prank(owner);
-        psyNFT.initialMint();
+        core.mintInitialBatch();
 
         uint256[] memory tokenIdsForUser = new uint256[](2);
         tokenIdsForUser[0] = 2;

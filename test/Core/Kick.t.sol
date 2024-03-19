@@ -9,7 +9,7 @@ contract KickTest is TestSetup {
         setUpTests();
 
         vm.prank(owner);
-        psyNFT.initialMint();
+        core.mintInitialBatch();
 
         uint256[] memory tokensForAlice = new uint256[](3);
         tokensForAlice[0] = 0;

@@ -3,34 +3,34 @@ pragma solidity 0.8.20;
 
 import "../TestSetup.sol";
 
-contract ApprovePsyNftTransferTest is TestSetup {
+contract ApproveTransferTest is TestSetup {
 
     function setUp() public {
         setUpTests();
         vm.prank(owner);
-        psyNFT.initialMint();
+        core.mintInitialBatch();
     }
 
-    function test_FailsIfNotContractOwner() public {
+    function test_FailsIfNotCalledByCoreContract() public {
         vm.prank(alice);
-        vm.expectRevert(abi.encodeWithSelector(OwnableUnauthorizedAccount.selector, address(alice)));
-        psyNFT.approvePsyNftTransfer(2, address(owner), 400);
+        vm.expectRevert("PsyNFT: Caller Not Core Contract");
+        psyNFT.approveTransfer(2, address(owner), 400);
     }
 
     function test_FailsIfTokenDoesNotExist() public {
         transferNftToUser(address(alice));        
-        vm.prank(owner);
+        vm.prank(address(core));
         vm.expectRevert("PsyNFT: Non Existent Token");
-        psyNFT.approvePsyNftTransfer(9, address(owner), 400);
+        psyNFT.approveTransfer(9, address(owner), 400);
     }
 
     function test_FailsIfApprovalAlreadyExists() public {
         transferNftToUser(address(alice));
-        vm.startPrank(owner);
-        psyNFT.approvePsyNftTransfer(2, address(bob), 400);
+        vm.startPrank(address(core));
+        psyNFT.approveTransfer(2, address(bob), 400);
 
         vm.expectRevert("PsyNFT: Transfer Request Currently Active");
-        psyNFT.approvePsyNftTransfer(2, address(owner), 400);
+        psyNFT.approveTransfer(2, address(owner), 400);
     }
 
     function test_ApprovingTransferWorksCorrectly() public {
@@ -40,8 +40,8 @@ contract ApprovePsyNftTransferTest is TestSetup {
         
         assertEq(initialTransferExpiryDate, 0);
         
-        vm.prank(owner);
-        psyNFT.approvePsyNftTransfer(2, address(bob), 400);
+        vm.prank(address(core));
+        psyNFT.approveTransfer(2, address(bob), 400);
 
         (
             uint256 tokenId, 

@@ -9,7 +9,7 @@ contract KickTest is TestSetup {
         setUpTests();
 
         vm.startPrank(owner);
-        psyNFT.initialMint();
+        core.mintInitialBatch();
         core.enableRageQuit();
         vm.stopPrank();
 
