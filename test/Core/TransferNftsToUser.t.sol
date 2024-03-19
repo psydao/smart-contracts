@@ -5,7 +5,7 @@ import "../TestSetup.sol";
 import "../../src/PsyNFT.sol";
 
 
-contract TransferNftsToAuctionTest is TestSetup {
+contract TransferNftsToUserTest is TestSetup {
 
     function setUp() public {
         setUpTests();

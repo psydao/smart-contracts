@@ -3,7 +3,7 @@ pragma solidity 0.8.20;
 
 import "../TestSetup.sol";
 
-contract KickTest is TestSetup {
+contract RageQuitTest is TestSetup {
 
     function setUp() public {
         setUpTests();
