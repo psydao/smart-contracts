@@ -29,6 +29,20 @@ contract Core is Ownable2Step {
         auctionContract = _auction;
     }
 
+    function enableRageQuit() external onlyOwner {
+        require(!rageQuitAllowed, "Treasury: Rage Quit Already Enabled");
+        rageQuitAllowed = true;
+    }
+
+    function disableRageQuit() external onlyOwner {
+        require(rageQuitAllowed, "Treasury: Rage Quit Already Disabled");
+        rageQuitAllowed = false;
+    }
+
+    // --------------------------------------------------------------------------------------------------------------------
+    // -----------------------------------------------> PSY NFT FUNCTIONS <------------------------------------------------
+    // --------------------------------------------------------------------------------------------------------------------
+
     function mintNextBatch() external onlyOwner {
         psyNFT.batchMintInFibonacci();
     }
@@ -41,15 +55,16 @@ contract Core is Ownable2Step {
         _transfer(_tokenIds, _user);
     }
 
-    function enableRageQuit() external onlyOwner {
-        require(!rageQuitAllowed, "Treasury: Rage Quit Already Enabled");
-        rageQuitAllowed = true;
-    }
+    // --------------------------------------------------------------------------------------------------------------------
+    // --------------------------------------------> TOKEN SALE FUNCTIONS <------------------------------------------------
+    // --------------------------------------------------------------------------------------------------------------------
 
-    function disableRageQuit() external onlyOwner {
-        require(rageQuitAllowed, "Treasury: Rage Quit Already Disabled");
-        rageQuitAllowed = false;
-    }
+    
+
+    
+    // --------------------------------------------------------------------------------------------------------------------
+    // ----------------------------------------------> TREASURY FUNCTIONS <------------------------------------------------
+    // --------------------------------------------------------------------------------------------------------------------
 
     function rageQuit(uint256 _tokenId) external {
         require(rageQuitAllowed, "Treasury: Rage Quit Disabled");
@@ -59,11 +74,15 @@ contract Core is Ownable2Step {
     function kick(uint256 _tokenId, address _user) external onlyOwner {
         treasury.exit(_tokenId, _user);
     }
+    
+
+    // --------------------------------------------------------------------------------------------------------------------
+    // ----------------------------------------------> INTERNAL FUNCTIONS <------------------------------------------------
+    // --------------------------------------------------------------------------------------------------------------------
 
     function _transfer(uint256[] memory _tokenIds, address _user) internal {
         psyNFT.transferNFTs(_tokenIds, _user);
     }
-    
     
 
 }
