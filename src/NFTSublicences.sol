@@ -31,7 +31,7 @@ contract NFTSublicences is ERC1155, Ownable {
         core = _core;
     }
 
-    function mintSublicences(address _minter, uint256 _erc721TokenId, uint256 _supply) external onlyCoreContract {
+    function mint(address _minter, uint256 _erc721TokenId, uint256 _supply) external onlyCoreContract {
         require(_minter == psyNFT.ownerOf(_erc721TokenId), "Core: Not Token Holder");
         _mint(_minter, _erc721TokenId, _supply, "");
     }

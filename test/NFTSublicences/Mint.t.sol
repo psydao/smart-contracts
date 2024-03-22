@@ -22,13 +22,13 @@ contract NFTSublicencesDeploymentTest is TestSetup {
     function test_FailsIfCallerNotCoreContract() public {
         vm.prank(owner);
         vm.expectRevert("NFTSublicences: Caller Not Core Contract");
-        sublicencesNft.mintSublicences(address(alice), 2, 100);
+        sublicencesNft.mint(address(alice), 2, 100);
     }
 
     function test_FailsIfMinterIsNotTokenHolder() public {
         vm.prank(address(core));
         vm.expectRevert("Core: Not Token Holder");
-        sublicencesNft.mintSublicences(address(bob), 2, 100);
+        sublicencesNft.mint(address(bob), 2, 100);
     }
 
     function test_MintNewSublicences() public {
@@ -36,7 +36,7 @@ contract NFTSublicencesDeploymentTest is TestSetup {
         
         assertEq(sublicencesNft.balanceOf(address(alice), ERC721_ID), 0);
         vm.prank(address(core));
-        sublicencesNft.mintSublicences(address(alice), ERC721_ID, 100);
+        sublicencesNft.mint(address(alice), ERC721_ID, 100);
         assertEq(sublicencesNft.balanceOf(address(alice), ERC721_ID), 100);
     }
 }

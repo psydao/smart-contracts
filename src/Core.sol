@@ -109,8 +109,8 @@ contract Core is Ownable2Step {
     // --------------------------------------------------------------------------------------------------------------------
 
     function mintSublicenses(uint256 _tokenId, uint256 _supply) external {
-        require(_supply > 0, "Core: Cannot Mint Les Than 1");
-        nftSublicenses.mintSublicences(msg.sender, _tokenId, _supply);
+        require(_supply > 0, "Core: Cannot Mint Less Than 1");
+        nftSublicenses.mint(msg.sender, _tokenId, _supply);
     }
 
 
