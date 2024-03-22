@@ -3,23 +3,27 @@ pragma solidity 0.8.20;
 
 import "openzeppelin-contracts/contracts/access/Ownable2Step.sol";
 import "./PsyNFT.sol";
+import "./NFTSublicences.sol";
 import "./Auction.sol";
 import "./Treasury.sol";
 
 contract Core is Ownable2Step {
     PsyNFT public psyNFT;
+    NFTSublicences public nftSublicenses;
     Treasury public treasury;
     address public auctionContract;
     bool public rageQuitAllowed;
 
     mapping(uint256 => address) public batchToAuctionAddress;
 
-    constructor(address _psyNFT, address _auction, address _treasury) Ownable(msg.sender) {
+    constructor(address _psyNFT, address _sublicenseNFT, address _auction, address _treasury) Ownable(msg.sender) {
         require(_psyNFT != address(0), "Cannot be address 0");
+        require(_sublicenseNFT != address(0), "Cannot be address 0");
         require(_auction != address(0), "Cannot be address 0");
         require(_treasury != address(0), "Cannot be address 0");
 
         psyNFT = PsyNFT(_psyNFT);
+        nftSublicenses = NFTSublicences(_sublicenseNFT);
         treasury = Treasury(payable(_treasury));
         auctionContract = _auction;
     }
@@ -99,6 +103,16 @@ contract Core is Ownable2Step {
     {
         psyNFT.approveTransfer(_tokenId, _to, _allowedTransferTimeInSeconds);
     }
+
+    // --------------------------------------------------------------------------------------------------------------------
+    // -------------------------------------------> PSY SUBLICENSE FUNCTIONS <---------------------------------------------
+    // --------------------------------------------------------------------------------------------------------------------
+
+    function mintSublicenses(uint256 _tokenId, uint256 _supply) external {
+        require(_supply > 0, "Core: Cannot Mint Les Than 1");
+        nftSublicenses.mintSublicences(msg.sender, _tokenId, _supply);
+    }
+
 
     // --------------------------------------------------------------------------------------------------------------------
     // ----------------------------------------------> TREASURY FUNCTIONS <------------------------------------------------

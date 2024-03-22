@@ -5,10 +5,16 @@ import "../TestSetup.sol";
 
 contract ApproveTransferTest is TestSetup {
 
+    uint256[] public tokens = new uint256[](3);
+
     function setUp() public {
         setUpTests();
         vm.prank(owner);
         core.mintInitialBatch();
+
+        tokens[0] = 0;
+        tokens[1] = 2;
+        tokens[2] = 3;
     }
 
     function test_FailsIfNotCalledByCoreContract() public {
@@ -18,14 +24,14 @@ contract ApproveTransferTest is TestSetup {
     }
 
     function test_FailsIfTokenDoesNotExist() public {
-        transferNftToUser(address(alice));        
+        transferNftToUser(address(alice), tokens);        
         vm.prank(address(core));
         vm.expectRevert("PsyNFT: Non Existent Token");
         psyNFT.approveTransfer(9, address(owner), 400);
     }
 
     function test_FailsIfApprovalAlreadyExists() public {
-        transferNftToUser(address(alice));
+        transferNftToUser(address(alice), tokens);        
         vm.startPrank(address(core));
         psyNFT.approveTransfer(2, address(bob), 400);
 
@@ -34,7 +40,7 @@ contract ApproveTransferTest is TestSetup {
     }
 
     function test_ApprovingTransferWorksCorrectly() public {
-        transferNftToUser(address(alice));
+        transferNftToUser(address(alice), tokens);        
 
         (,, uint256 initialTransferExpiryDate) = psyNFT.approvedTransfers(2);
         
@@ -52,15 +58,5 @@ contract ApproveTransferTest is TestSetup {
         assertEq(tokenId, 2);
         assertEq(to, address(bob));
         assertEq(transferExpiryDate, 401);
-    }
-
-    function transferNftToUser(address _user) public {
-        uint256[] memory tokens = new uint256[](3);
-        tokens[0] = 0;
-        tokens[1] = 2;
-        tokens[2] = 3;
-
-        vm.prank(address(core));
-        psyNFT.transferNFTs(tokens, _user);
     }
 }

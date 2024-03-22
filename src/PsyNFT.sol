@@ -73,7 +73,6 @@ contract PsyNFT is ERC721, Ownable2Step, ReentrancyGuard {
      * @param _tokenIds An array of token IDs to be transferred.
      * @param _recipient The address of the recipient.
      */
-
     function transferNFTs(uint256[] memory _tokenIds, address _recipient) external onlyCoreContract {
         require(_recipient != address(0), "Cannot be address 0");
         require(_tokenIds.length != 0, "No tokens to transfer");
