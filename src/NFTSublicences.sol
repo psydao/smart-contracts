@@ -12,12 +12,8 @@ contract NFTSublicences is ERC1155, Ownable {
 
     mapping(uint256 => uint256) public psyNftSublicenseSupply;
 
-    constructor(address _psyNft) ERC1155("") Ownable(msg.sender) {
+    constructor(address _psyNft, string memory _initUri) ERC1155(_initUri) Ownable(msg.sender) {
         psyNFT = PsyNFT(_psyNft);
-    }
-
-    function setURI(string memory newuri) public {
-        _setURI(newuri);
     }
 
     /**
@@ -34,6 +30,10 @@ contract NFTSublicences is ERC1155, Ownable {
     function mint(address _minter, uint256 _erc721TokenId, uint256 _supply) external onlyCoreContract {
         require(_minter == psyNFT.ownerOf(_erc721TokenId), "Core: Not Token Holder");
         _mint(_minter, _erc721TokenId, _supply, "");
+    }
+
+    function updateBaseUri(string memory _newuri) external onlyOwner {
+        _setURI(_newuri);
     }
 
     modifier onlyCoreContract() {

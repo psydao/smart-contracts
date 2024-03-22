@@ -36,7 +36,7 @@ contract TestSetup is Test {
     function setUpTests() public {
         vm.startPrank(owner);
         psyNFT = new PsyNFT();
-        sublicencesNft = new NFTSublicences(address(psyNFT));
+        sublicencesNft = new NFTSublicences(address(psyNFT), "");
         auction = new Auction();
         treasury = new Treasury(address(psyNFT));
         core = new Core(address(psyNFT), address(sublicencesNft), address(auction), address(treasury));

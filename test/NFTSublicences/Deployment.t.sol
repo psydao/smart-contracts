@@ -11,9 +11,10 @@ contract NFTSublicencesDeploymentTest is TestSetup {
 
     function test_VariablesInitializedCorrectly() public {
         vm.prank(owner);
-        NFTSublicences sublicenceContract = new NFTSublicences(address(psyNFT));
+        NFTSublicences sublicenceContract = new NFTSublicences(address(psyNFT), "MetaData.xt");
 
         assertEq(sublicenceContract.core(), address(0));
+        assertEq(sublicenceContract.uri(2), "MetaData.xt");
         assertEq(sublicenceContract.owner(), address(owner));
     }
 }
