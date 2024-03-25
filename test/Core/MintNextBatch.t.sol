@@ -11,7 +11,7 @@ contract MintNextBatchTest is TestSetup {
 
     function test_BatchMintFailsWhenNotContractOwner() public {
         vm.prank(owner);
-        psyNFT.initialMint();
+        core.mintInitialBatch();
         
         vm.prank(alice);
         vm.expectRevert(abi.encodeWithSelector(OwnableUnauthorizedAccount.selector, address(alice)));
@@ -24,7 +24,7 @@ contract MintNextBatchTest is TestSetup {
         assertEq(psyNFT.balanceOf(address(psyNFT)), 0);
        
         vm.startPrank(owner);
-        psyNFT.initialMint();
+        core.mintInitialBatch();
 
         core.mintNextBatch();
         core.mintNextBatch();

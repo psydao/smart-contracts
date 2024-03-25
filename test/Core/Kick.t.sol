@@ -9,7 +9,7 @@ contract KickTest is TestSetup {
         setUpTests();
 
         vm.prank(owner);
-        psyNFT.initialMint();
+        core.mintInitialBatch();
 
         uint256[] memory tokensForAlice = new uint256[](3);
         tokensForAlice[0] = 0;
@@ -41,10 +41,5 @@ contract KickTest is TestSetup {
         core.kick(0, address(alice));
 
         assertEq(treasury.userBalances(address(alice)), treasuryPortion);
-    }
-
-    function transferNftToUser(address _user, uint256[] memory _tokens) public {
-        vm.prank(address(core));
-        psyNFT.transferNFTs(_tokens, _user);
     }
 }

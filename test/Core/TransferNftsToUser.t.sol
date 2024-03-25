@@ -5,7 +5,7 @@ import "../TestSetup.sol";
 import "../../src/PsyNFT.sol";
 
 
-contract TransferNftsToAuctionTest is TestSetup {
+contract TransferNftsToUserTest is TestSetup {
 
     function setUp() public {
         setUpTests();
@@ -23,7 +23,7 @@ contract TransferNftsToAuctionTest is TestSetup {
 
     function test_TransferToUser() public {
         vm.prank(owner);
-        psyNFT.initialMint();
+        core.mintInitialBatch();
 
         uint256[] memory tokenIdsForUser = new uint256[](2);
         tokenIdsForUser[0] = 2;

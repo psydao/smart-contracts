@@ -8,14 +8,14 @@ contract InitialMintTest is TestSetup {
        setUpTests();
     }
 
-    function test_InitialMintFailsWhenNotOwner() public {
+    function test_InitialMintFailsWhenNotCoreContract() public {
         vm.prank(alice);
-        vm.expectRevert(abi.encodeWithSelector(OwnableUnauthorizedAccount.selector, address(alice)));
+        vm.expectRevert("PsyNFT: Caller Not Core Contract");
         psyNFT.initialMint();
     }
 
     function test_InitialMintFailsWhenAlreadyCalled() public {
-         vm.startPrank(owner);
+         vm.startPrank(address(core));
         psyNFT.initialMint();
         vm.expectRevert("Initial mint completed");
         psyNFT.initialMint();
@@ -27,7 +27,7 @@ contract InitialMintTest is TestSetup {
         assertEq(psyNFT.initialMintCalled(), false);
         assertEq(psyNFT.balanceOf(address(psyNFT)), 0);
 
-        vm.prank(owner);
+        vm.prank(address(core));
         psyNFT.initialMint();
 
         assertEq(psyNFT.previousFibonacci(), 3);

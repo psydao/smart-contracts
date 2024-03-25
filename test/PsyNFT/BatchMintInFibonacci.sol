@@ -10,10 +10,10 @@ contract BatchMintInFibonacciTest is TestSetup {
     }
 
     function test_BatchMintFailsWhenNotCoreContract() public {
-        vm.startPrank(owner);
-        psyNFT.initialMint();
+        vm.prank(owner);
+        core.mintInitialBatch();
 
-        vm.expectRevert("Only callable by Core.sol");
+        vm.expectRevert("PsyNFT: Caller Not Core Contract");
         psyNFT.batchMintInFibonacci();
     }
 
@@ -29,7 +29,7 @@ contract BatchMintInFibonacciTest is TestSetup {
         assertEq(psyNFT.balanceOf(address(psyNFT)), 0);
        
         vm.prank(owner);
-        psyNFT.initialMint();
+        core.mintInitialBatch();
 
         vm.startPrank(address(core));
         psyNFT.batchMintInFibonacci();

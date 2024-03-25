@@ -9,7 +9,7 @@ contract ExitTest is TestSetup {
         setUpTests();
 
         vm.startPrank(owner);
-        psyNFT.initialMint();
+        core.mintInitialBatch();
         core.enableRageQuit();
         vm.stopPrank();
 
@@ -50,10 +50,5 @@ contract ExitTest is TestSetup {
         treasury.exit(0, address(alice));
 
         assertEq(treasury.userBalances(address(alice)), treasuryPortion);
-    }
-
-    function transferNftToUser(address _user, uint256[] memory _tokens) public {
-        vm.prank(address(core));
-        psyNFT.transferNFTs(_tokens, _user);
     }
 }

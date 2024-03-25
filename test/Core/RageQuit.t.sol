@@ -3,13 +3,13 @@ pragma solidity 0.8.20;
 
 import "../TestSetup.sol";
 
-contract KickTest is TestSetup {
+contract RageQuitTest is TestSetup {
 
     function setUp() public {
         setUpTests();
 
         vm.startPrank(owner);
-        psyNFT.initialMint();
+        core.mintInitialBatch();
         core.enableRageQuit();
         vm.stopPrank();
 
@@ -46,10 +46,5 @@ contract KickTest is TestSetup {
         core.rageQuit(0);
 
         assertEq(treasury.userBalances(address(alice)), treasuryPortion);
-    }
-
-    function transferNftToUser(address _user, uint256[] memory _tokens) public {
-        vm.prank(address(core));
-        psyNFT.transferNFTs(_tokens, _user);
     }
 }

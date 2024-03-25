@@ -33,7 +33,7 @@ contract PsyNFT is ERC721, Ownable2Step, ReentrancyGuard {
      * @dev Only the contract owner can call this function.
      * @dev This function can only be called once.
      */
-    function initialMint() external onlyOwner nonReentrant {
+    function initialMint() external onlyCoreContract nonReentrant {
         require(!initialMintCalled, "Initial mint completed");
 
         initialMintCalled = true;
@@ -51,7 +51,7 @@ contract PsyNFT is ERC721, Ownable2Step, ReentrancyGuard {
 
     /**
      * @notice Batch mints a specified number of tokens in a Fibonacci sequence.
-     * @dev Only the contract owner can call this function.
+     * @dev Only the core contract can call this function.
      * @dev Requires that the initial mint has been completed.
      * @dev The number of tokens to be minted is determined by the previous Fibonacci number.
      */
@@ -69,11 +69,10 @@ contract PsyNFT is ERC721, Ownable2Step, ReentrancyGuard {
     }
     /**
      * @notice Transfers multiple NFTs to a specified recipient.
-     * @dev Only the contract owner can call this function.
+     * @dev Only the core contract can call this function.
      * @param _tokenIds An array of token IDs to be transferred.
      * @param _recipient The address of the recipient.
      */
-
     function transferNFTs(uint256[] memory _tokenIds, address _recipient) external onlyCoreContract {
         require(_recipient != address(0), "Cannot be address 0");
         require(_tokenIds.length != 0, "No tokens to transfer");
@@ -84,15 +83,14 @@ contract PsyNFT is ERC721, Ownable2Step, ReentrancyGuard {
 
     /**
      * @notice Approves the transfer of a PsyNFT token to a specified recipient.
-     * @dev Only the contract owner can call this function.
+     * @dev Only the core contract can call this function.
      * @dev Cann approve address(0) for the purpose of burning.
      * @param _tokenId The ID of the PsyNFT token to be transferred.
      * @param _to The address of the recipient.
      * @param _allowedTransferTimeInSeconds The duration in seconds for which the transfer is allowed.
      */
-    function approvePsyNftTransfer(uint256 _tokenId, address _to, uint256 _allowedTransferTimeInSeconds)
-        external
-        onlyOwner
+    function approveTransfer(uint256 _tokenId, address _to, uint256 _allowedTransferTimeInSeconds)
+        external onlyCoreContract
     {
         require(_tokenId < tokenId, "PsyNFT: Non Existent Token");
         require(
@@ -186,7 +184,7 @@ contract PsyNFT is ERC721, Ownable2Step, ReentrancyGuard {
     }
 
     modifier onlyCoreContract() {
-        require(msg.sender == address(core), "Only callable by Core.sol");
+        require(msg.sender == address(core), "PsyNFT: Caller Not Core Contract");
         _;
     }
 }

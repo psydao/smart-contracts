@@ -3,6 +3,7 @@ pragma solidity 0.8.20;
 
 import "forge-std/Test.sol";
 import "../src/PsyNFT.sol";
+import "../src/NFTSublicences.sol";
 import "../src/Auction.sol";
 import "../src/Core.sol";
 import "../src/Treasury.sol";
@@ -18,6 +19,7 @@ contract TestSetup is Test {
     event Transfer(address from, address to, uint256 tokenId);
 
     PsyNFT public psyNFT;
+    NFTSublicences public sublicencesNft;
     Auction public auction;
     Core public core;
     Treasury public treasury;
@@ -34,14 +36,21 @@ contract TestSetup is Test {
     function setUpTests() public {
         vm.startPrank(owner);
         psyNFT = new PsyNFT();
+        sublicencesNft = new NFTSublicences(address(psyNFT), "");
         auction = new Auction();
         treasury = new Treasury(address(psyNFT));
-        core = new Core(address(psyNFT), address(auction), address(treasury));
+        core = new Core(address(psyNFT), address(sublicencesNft), address(auction), address(treasury));
         psyToken = new TestPsyToken("TestPsy", "PSY");
         tokenSale = new TokenSale(address(psyToken), 0.1 ether);
         psyNFT.setCoreContract(address(core));
+        sublicencesNft.setCoreContract(address(core));
         psyNFT.setTreasury(address(treasury));
         treasury.setCoreContract(address(core));
         vm.stopPrank();
+    }
+    
+    function transferNftToUser(address _user, uint256[] memory _tokens) public {
+        vm.prank(address(core));
+        psyNFT.transferNFTs(_tokens, _user);
     }
 }
