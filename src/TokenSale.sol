@@ -26,13 +26,8 @@ contract TokenSale is Ownable2Step, ReentrancyGuard {
         require(_psyToken != address(0), "Cannot be address 0");
 
         //Mainnet USD/ETH price feed address
-        // dataFeed = AggregatorV3Interface(
-        //     0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419
-        // );
-
-        //Sepolia USD/ETH price feed address
         dataFeed = AggregatorV3Interface(
-            0x694AA1769357215DE4FAC081bf1f309aDC325306
+            0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419
         );
 
         psyToken = IERC20(_psyToken);

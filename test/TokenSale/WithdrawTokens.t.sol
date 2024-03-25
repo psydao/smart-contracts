@@ -6,7 +6,9 @@ import "../TestSetup.sol";
 contract WithdrawTokensTest is TestSetup {
 
     uint256 sepoliaFork;
+    uint256 mainnetFork;
     string SEPOLIA_RPC_URL = vm.envString("SEPOLIA_RPC_URL");
+    string MAINNET_RPC_URL = vm.envString("MAINNET_RPC_URL");
 
     function setUp() public {
         setupFork();
@@ -95,6 +97,7 @@ contract WithdrawTokensTest is TestSetup {
 
     function setupFork() public {
         sepoliaFork = vm.createFork(SEPOLIA_RPC_URL);
-        vm.selectFork(sepoliaFork);
+        mainnetFork = vm.createFork(MAINNET_RPC_URL);
+        vm.selectFork(mainnetFork);
     }
 }
