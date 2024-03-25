@@ -5,11 +5,13 @@ import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "openzeppelin-contracts/contracts/access/Ownable2Step.sol";
+import {AggregatorV3Interface} from "@chainlink/contracts/src/interfaces/feeds/AggregatorV3Interface.sol";
+import "forge-std/console.sol";
 
 contract TokenSale is Ownable2Step, ReentrancyGuard {
     using SafeERC20 for IERC20;
 
-    uint256 public tokenPriceInETH;
+    uint256 public tokenPriceInDollar;
     uint256 public supply;
 
     bool public saleActive;
@@ -18,12 +20,23 @@ contract TokenSale is Ownable2Step, ReentrancyGuard {
     mapping(address => uint256) public userBalances;
 
     IERC20 public immutable psyToken;
+    AggregatorV3Interface internal dataFeed;
 
     constructor(address _psyToken, uint256 _tokenPrice) Ownable(msg.sender) {
         require(_psyToken != address(0), "Cannot be address 0");
 
+        //Mainnet USD/ETH price feed address
+        // dataFeed = AggregatorV3Interface(
+        //     0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419
+        // );
+
+        //Sepolia USD/ETH price feed address
+        dataFeed = AggregatorV3Interface(
+            0x694AA1769357215DE4FAC081bf1f309aDC325306
+        );
+
         psyToken = IERC20(_psyToken);
-        tokenPriceInETH = _tokenPrice;
+        tokenPriceInDollar = _tokenPrice;
         saleActive = true;
         tokensLocked = true;
     }
@@ -37,7 +50,10 @@ contract TokenSale is Ownable2Step, ReentrancyGuard {
         require(_amountOfPsyTokens > 0, "Amount Must Be Bigger Than 0");
         require(_hasSufficientSupplyForPurchase(_amountOfPsyTokens), "PsyToken: Not enough supply");
 
-        uint256 ethAmount = _amountOfPsyTokens * tokenPriceInETH;
+        console.log("Value sent in:", msg.value);
+        uint256 ethPricePerToken = ethAmountPerPsyToken();
+        uint256 ethAmount = _amountOfPsyTokens * ethPricePerToken;
+        console.log("Eth amount needed", ethAmount);
         require(msg.value == ethAmount, "ETH: Incorrect Amount Sent In");
 
         userBalances[msg.sender] += _amountOfPsyTokens;
@@ -109,8 +125,8 @@ contract TokenSale is Ownable2Step, ReentrancyGuard {
      * @dev The new price must be different from the current token price.
      */
     function setTokenPrice(uint256 _newPrice) external onlyOwner {
-        require(_newPrice != tokenPriceInETH, "PsyToken: New Token Price Same As Current");
-        tokenPriceInETH = _newPrice;
+        require(_newPrice != tokenPriceInDollar, "PsyToken: New Token Price Same As Current");
+        tokenPriceInDollar = _newPrice;
     }
 
     /**
@@ -120,5 +136,22 @@ contract TokenSale is Ownable2Step, ReentrancyGuard {
      */
     function _hasSufficientSupplyForPurchase(uint256 _amount) internal view returns (bool) {
         return (supply >= _amount);
+    }
+
+    function _getDollarAmountPerEth() internal returns (uint256) {
+        (
+            /* uint80 roundID */,
+            int amount,
+            /*uint startedAt*/,
+            /*uint timeStamp*/,
+            /*uint80 answeredInRound*/
+        ) = dataFeed.latestRoundData();
+        return uint256(amount) * 10**10;
+    }
+
+    function ethAmountPerPsyToken() public returns (uint256) {
+        uint256 dollarPricePerEth = _getDollarAmountPerEth();
+        uint256 dollarRatio = dollarPricePerEth / tokenPriceInDollar;
+        return 1 ether / dollarRatio;
     }
 }
