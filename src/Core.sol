@@ -17,15 +17,15 @@ contract Core is Ownable2Step {
     mapping(uint256 => address) public batchToAuctionAddress;
 
     constructor(address _psyNFT, address _sublicenseNFT, address _auction, address _treasury) Ownable(msg.sender) {
-        require(_psyNFT != address(0), "Cannot be address 0");
-        require(_sublicenseNFT != address(0), "Cannot be address 0");
-        require(_auction != address(0), "Cannot be address 0");
-        require(_treasury != address(0), "Cannot be address 0");
+        require(_psyNFT != address(0), "Core: Cannot Be Zero Address");
+        require(_sublicenseNFT != address(0), "Core: Cannot Be Zero Address");
+        require(_auction != address(0), "Core: Cannot Be Zero Address");
+        require(_treasury != address(0), "Core: Cannot Be Zero Address");
 
         psyNFT = PsyNFT(_psyNFT);
         nftSublicenses = NFTSublicences(_sublicenseNFT);
         treasury = Treasury(payable(_treasury));
-        auctionContract = _auction;  
+        auctionContract = _auction;
         rageQuitAllowed = false;
     }
 
@@ -52,7 +52,6 @@ contract Core is Ownable2Step {
         rageQuitAllowed = false;
     }
 
-    
     // --------------------------------------------------------------------------------------------------------------------
     // -----------------------------------------------> PSY NFT FUNCTIONS <------------------------------------------------
     // --------------------------------------------------------------------------------------------------------------------
@@ -110,6 +109,13 @@ contract Core is Ownable2Step {
     // -------------------------------------------> PSY SUBLICENSE FUNCTIONS <---------------------------------------------
     // --------------------------------------------------------------------------------------------------------------------
 
+    /**
+     * @notice Mints sublicenses for a specified token ID.
+     * @dev This function allows the contract owner to mint sublicenses for a specified token ID.
+     * @dev The supply of sublicenses to be minted must be greater than 0.
+     * @param _tokenId The ID of the token for which sublicenses will be minted.
+     * @param _supply The number of sublicenses to be minted.
+     */
     function mintSublicenses(uint256 _tokenId, uint256 _supply) external {
         require(_supply > 0, "Core: Cannot Mint Less Than 1");
         nftSublicenses.mint(msg.sender, _tokenId, _supply);
@@ -125,7 +131,7 @@ contract Core is Ownable2Step {
      * @param _tokenId The ID of the token to be burned.
      */
     function rageQuit(uint256 _tokenId) external {
-        require(rageQuitAllowed, "Treasury: Rage Quit Disabled");
+        require(rageQuitAllowed, "Core: Rage Quit Disabled");
         treasury.exit(_tokenId, msg.sender);
     }
 

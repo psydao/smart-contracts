@@ -9,12 +9,15 @@ contract ApproveNftTest is TestSetup {
 
     function setUp() public {
         setUpTests();
-        vm.prank(owner);
-        core.mintInitialBatch();
-
+        
         tokens[0] = 0;
         tokens[1] = 2;
         tokens[2] = 3;
+
+        vm.prank(owner);
+        core.mintInitialBatch();
+
+        
     }
 
     function test_FailsIfCallerIsNotContractOwner() public {

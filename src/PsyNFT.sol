@@ -28,6 +28,7 @@ contract PsyNFT is ERC721, Ownable2Step, ReentrancyGuard {
 
     constructor() ERC721("PsyNFT", "PSY") Ownable(msg.sender) {
         controlledTransfers = true;
+        previousFibonacci = 3;
     }
 
     /**
@@ -39,7 +40,6 @@ contract PsyNFT is ERC721, Ownable2Step, ReentrancyGuard {
         require(!initialMintCalled, "PsyNFT: Initial Mint Complete");
 
         initialMintCalled = true;
-        previousFibonacci = 3;
 
         uint256 localTokenId = 0;
 

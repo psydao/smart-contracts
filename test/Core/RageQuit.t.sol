@@ -26,7 +26,7 @@ contract RageQuitTest is TestSetup {
         core.disableRageQuit();
         
         vm.prank(address(alice));
-        vm.expectRevert("Treasury: Rage Quit Disabled");
+        vm.expectRevert("Core: Rage Quit Disabled");
         core.rageQuit(0);
     }
 

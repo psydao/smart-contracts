@@ -27,14 +27,14 @@ contract ResumeSaleTest is TestSetup {
         vm.startPrank(owner);
         tokenSale.setSupply();
 
-        vm.expectRevert("PsyToken: Token Not Paused");
+        vm.expectRevert("TokenSale: Token Not Paused");
         tokenSale.resumeSale();
     }
 
     function test_FailsIfSupplyNotBiggerThan0() public {
         vm.startPrank(owner);
         tokenSale.pauseSale();
-        vm.expectRevert("PsyToken: Supply Finished");
+        vm.expectRevert("TokenSale: Supply Finished");
         tokenSale.resumeSale();
     }
 

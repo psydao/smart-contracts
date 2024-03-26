@@ -22,7 +22,7 @@ contract UnlockTokenTest is TestSetup {
         vm.startPrank(owner);
         tokenSale.unlockToken();
 
-        vm.expectRevert("PsyToken: Tokens Already Unlocked");
+        vm.expectRevert("TokenSale: Tokens Already Unlocked");
         tokenSale.unlockToken();
     }
 

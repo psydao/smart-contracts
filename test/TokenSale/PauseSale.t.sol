@@ -19,7 +19,7 @@ contract PauseSaleTest is TestSetup {
         vm.startPrank(owner);
         tokenSale.pauseSale();
 
-        vm.expectRevert("PsyToken: Token Already Paused");
+        vm.expectRevert("TokenSale: Token Already Paused");
         tokenSale.pauseSale();
     }
 

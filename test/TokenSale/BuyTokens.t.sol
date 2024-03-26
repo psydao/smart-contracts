@@ -23,7 +23,7 @@ contract BuyTokensTest is TestSetup {
         uint256 amountAliceMustPay = tokenSale.calculateEthAmountPerPsyToken() * 9;
 
         vm.startPrank(alice);
-        vm.expectRevert("PsyToken: Not enough supply");
+        vm.expectRevert("TokenSale: Not enough supply");
         tokenSale.buyTokens{value: amountAliceMustPay}(9);
     }
 
@@ -33,7 +33,7 @@ contract BuyTokensTest is TestSetup {
         tokenSale.setSupply();
 
         vm.startPrank(alice);
-        vm.expectRevert("ETH: Incorrect Amount Sent In");
+        vm.expectRevert("TokenSale: Incorrect Amount Sent In");
         tokenSale.buyTokens{value: 1.1 ether}(10);
     }
 
@@ -47,7 +47,7 @@ contract BuyTokensTest is TestSetup {
         uint256 amountAliceMustPay = tokenSale.calculateEthAmountPerPsyToken() * 10;
 
         vm.startPrank(alice);
-        vm.expectRevert("PsyToken: Sale Paused");
+        vm.expectRevert("TokenSale: Sale Paused");
         tokenSale.buyTokens{value: amountAliceMustPay}(10);
     }
 
@@ -57,7 +57,7 @@ contract BuyTokensTest is TestSetup {
         tokenSale.setSupply();
 
         vm.startPrank(alice);
-        vm.expectRevert("Amount Must Be Bigger Than 0");
+        vm.expectRevert("TokenSale: Amount Must Be Bigger Than 0");
         tokenSale.buyTokens{value: 0 ether}(0);
     }
 

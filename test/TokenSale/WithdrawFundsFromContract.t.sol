@@ -25,7 +25,7 @@ contract WithdrawFundsFromContractTest is TestSetup {
         tokenSale.buyTokens{value: amountAliceMustPay}(9);
 
         vm.prank(owner);
-        vm.expectRevert("TokenSale: Receiver Cannot Be Address 0");
+        vm.expectRevert("TokenSale: Receiver Cannot Be Zero Address");
         tokenSale.withdrawFundsFromContract(address(0));
     }
 

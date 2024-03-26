@@ -18,7 +18,7 @@ contract WithdrawTokensTest is TestSetup {
 
     function test_FailsIfNotInWithdrawableStatus() public {
         vm.prank(alice);
-        vm.expectRevert("PsyToken: Tokens Locked");
+        vm.expectRevert("TokenSale: Tokens Locked");
         tokenSale.withdrawTokens();
     }
 
@@ -29,7 +29,7 @@ contract WithdrawTokensTest is TestSetup {
         vm.stopPrank();
 
         vm.prank(robyn);
-        vm.expectRevert("PsyToken: Insufficient funds");
+        vm.expectRevert("TokenSale: Insufficient funds");
         tokenSale.withdrawTokens();
     }
 
