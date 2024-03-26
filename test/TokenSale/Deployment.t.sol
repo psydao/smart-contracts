@@ -10,12 +10,12 @@ contract TokenSaleDeploymentTest is TestSetup {
     }
 
     function test_FailsIfPsyTokenIsAddressZero() public {
-        vm.expectRevert("TokenSale: Cannot Be Address 0");
+        vm.expectRevert("TokenSale: Cannot Be Zero Address");
         TokenSale testTokenSale = new TokenSale(address(0), chainlinkMainnetPriceFeed, 0.1 ether);
     }
 
     function test_FailsIfChainlinkPriceFeedIsAddressZero() public {
-        vm.expectRevert("TokenSale: Cannot Be Address 0");
+        vm.expectRevert("TokenSale: Cannot Be Zero Address");
         TokenSale testTokenSale = new TokenSale(address(psyNFT), address(0), 0.1 ether);
     }
 

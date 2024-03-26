@@ -17,7 +17,7 @@ contract SetTokenPrice is TestSetup {
 
     function test_FailsIfNewPriceIsSameAsCurrentPrice() public {
         vm.startPrank(owner);
-        vm.expectRevert("PsyToken: New Token Price Same As Current");
+        vm.expectRevert("TokenSale: New Token Price Same As Current");
         tokenSale.setTokenPrice(0.1 ether);
     }
 

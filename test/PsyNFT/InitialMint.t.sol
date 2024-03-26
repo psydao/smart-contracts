@@ -17,12 +17,12 @@ contract InitialMintTest is TestSetup {
     function test_InitialMintFailsWhenAlreadyCalled() public {
          vm.startPrank(address(core));
         psyNFT.initialMint();
-        vm.expectRevert("Initial mint completed");
+        vm.expectRevert("PsyNFT: Initial Mint Complete");
         psyNFT.initialMint();
     }
 
     function test_InitialMintWorks() public {
-        assertEq(psyNFT.previousFibonacci(), 0);
+        assertEq(psyNFT.previousFibonacci(), 3);
         assertEq(psyNFT.tokenId(), 0);
         assertEq(psyNFT.initialMintCalled(), false);
         assertEq(psyNFT.balanceOf(address(psyNFT)), 0);

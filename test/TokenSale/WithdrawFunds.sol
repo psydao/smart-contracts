@@ -25,8 +25,8 @@ contract WithdrawFundsFromContractTest is TestSetup {
         tokenSale.buyTokens{value: amountAliceMustPay}(9);
 
         vm.prank(owner);
-        vm.expectRevert("TokenSale: Receiver Cannot Be Address 0");
-        tokenSale.withdrawFundsFromContract(address(0));
+        vm.expectRevert("TokenSale: Receiver Cannot Be Zero Address");
+        tokenSale.withdrawFunds(address(0));
     }
 
     function test_FailsIfCallerIsnotContractOwner() public {
@@ -42,7 +42,7 @@ contract WithdrawFundsFromContractTest is TestSetup {
 
         vm.prank(alice);
         vm.expectRevert(abi.encodeWithSelector(OwnableUnauthorizedAccount.selector, address(alice)));
-        tokenSale.withdrawFundsFromContract(address(alice));
+        tokenSale.withdrawFunds(address(alice));
     }
 
     function test_WithdrawsEthToOwner() public {
@@ -60,7 +60,7 @@ contract WithdrawFundsFromContractTest is TestSetup {
         uint256 ownerBalanceBeforeTransfer = address(owner).balance;
 
         vm.prank(owner);
-        tokenSale.withdrawFundsFromContract(address(owner));
+        tokenSale.withdrawFunds(address(owner));
 
         assertEq(address(tokenSale).balance, 0);
         assertEq(address(owner).balance, ownerBalanceBeforeTransfer + amountAliceMustPay);

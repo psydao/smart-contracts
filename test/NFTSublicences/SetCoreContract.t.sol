@@ -12,19 +12,19 @@ contract SetCoreContractTest is TestSetup {
     function test_FailsIfCallerIsNotContractOwner() public {
         vm.prank(alice);
         vm.expectRevert(abi.encodeWithSelector(OwnableUnauthorizedAccount.selector, address(alice)));
-        psyNFT.setCoreContract(address(core));
+        sublicencesNft.setCoreContract(address(core));
     }
 
     function test_FailsIfCoreIsAddressZero() public {
         vm.prank(owner);
-        vm.expectRevert("PsyNFT: Core Cannot Be Zero Address");
-        psyNFT.setCoreContract(address(0));
+        vm.expectRevert("NFTSublicences: Cannot Be Zero Address");
+        sublicencesNft.setCoreContract(address(0));
     }
 
     function test_SetsCoreContractCorrectly() public {
-        assertEq(psyNFT.core(), address(core));
+        assertEq(sublicencesNft.core(), address(core));
         vm.prank(owner);
-        psyNFT.setCoreContract(address(alice));
-        assertEq(psyNFT.core(), address(alice));
+        sublicencesNft.setCoreContract(address(alice));
+        assertEq(sublicencesNft.core(), address(alice));
     }
 }

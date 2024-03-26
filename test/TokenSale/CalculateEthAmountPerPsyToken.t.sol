@@ -3,7 +3,7 @@ pragma solidity 0.8.20;
 
 import "../TestSetup.sol";
 
-contract EthAmountPerPsyTokenTest is TestSetup {
+contract CalculateEthAmountPerPsyTokenTest is TestSetup {
 
     uint256 mainnetFork;
     string MAINNET_RPC_URL = vm.envString("MAINNET_RPC_URL");

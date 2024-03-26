@@ -19,12 +19,12 @@ contract BatchMintInFibonacciTest is TestSetup {
 
     function test_BatchMintFailsIfInitialMintNotComplete() public {
         vm.prank(address(core));
-        vm.expectRevert("Initial mint not completed");
+        vm.expectRevert("PsyNFT: Initial Mint Not Completed");
         psyNFT.batchMintInFibonacci();
     }
 
     function test_BatchMintWorks() public {
-        assertEq(psyNFT.previousFibonacci(), 0);
+        assertEq(psyNFT.previousFibonacci(), 3);
         assertEq(psyNFT.tokenId(), 0);
         assertEq(psyNFT.balanceOf(address(psyNFT)), 0);
        

@@ -6,7 +6,6 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "openzeppelin-contracts/contracts/access/Ownable2Step.sol";
 import {AggregatorV3Interface} from "@chainlink/contracts/src/interfaces/feeds/AggregatorV3Interface.sol";
-import "forge-std/console.sol";
 
 contract TokenSale is Ownable2Step, ReentrancyGuard {
     using SafeERC20 for IERC20;
@@ -24,8 +23,8 @@ contract TokenSale is Ownable2Step, ReentrancyGuard {
     AggregatorV3Interface public dataFeed;
 
     constructor(address _psyToken, address _chainlinkPriceFeed, uint256 _tokenPrice) Ownable(msg.sender) {
-        require(_psyToken != address(0), "TokenSale: Cannot Be Address 0");
-        require(_chainlinkPriceFeed != address(0), "TokenSale: Cannot Be Address 0");
+        require(_psyToken != address(0), "TokenSale: Cannot Be Zero Address");
+        require(_chainlinkPriceFeed != address(0), "TokenSale: Cannot Be Zero Address");
 
         //Mainnet USD/ETH price feed address
         dataFeed = AggregatorV3Interface(_chainlinkPriceFeed);
@@ -41,13 +40,13 @@ contract TokenSale is Ownable2Step, ReentrancyGuard {
      * @param _amountOfPsyTokens The amount of PsyTokens to buy.
      */
     function buyTokens(uint256 _amountOfPsyTokens) external payable nonReentrant {
-        require(saleActive, "PsyToken: Sale Paused");
-        require(_amountOfPsyTokens > 0, "Amount Must Be Bigger Than 0");
-        require(_hasSufficientSupplyForPurchase(_amountOfPsyTokens), "PsyToken: Not enough supply");
+        require(saleActive, "TokenSale: Sale Paused");
+        require(_amountOfPsyTokens > 0, "TokenSale: Amount Must Be Bigger Than 0");
+        require(_hasSufficientSupplyForPurchase(_amountOfPsyTokens), "TokenSale: Not enough supply");
 
         uint256 ethPricePerToken = calculateEthAmountPerPsyToken();
         uint256 ethAmount = _amountOfPsyTokens * ethPricePerToken;
-        require(msg.value == ethAmount, "ETH: Incorrect Amount Sent In");
+        require(msg.value == ethAmount, "TokenSale: Incorrect Amount Sent In");
 
         userBalances[msg.sender] += _amountOfPsyTokens;
         supply -= _amountOfPsyTokens;
@@ -62,8 +61,8 @@ contract TokenSale is Ownable2Step, ReentrancyGuard {
      * @dev The user must have a positive balance of tokens and the sale status must be set to WITHDRAWABLE.
      */
     function withdrawTokens() external nonReentrant {
-        require(!tokensLocked, "PsyToken: Tokens Locked");
-        require(userBalances[msg.sender] > 0, "PsyToken: Insufficient funds");
+        require(!tokensLocked, "TokenSale: Tokens Locked");
+        require(userBalances[msg.sender] > 0, "TokenSale: Insufficient funds");
 
         uint256 amount = userBalances[msg.sender];
         userBalances[msg.sender] = 0;
@@ -77,7 +76,7 @@ contract TokenSale is Ownable2Step, ReentrancyGuard {
      * @dev The sale status must be set to OPEN in order to pause it.
      */
     function pauseSale() external onlyOwner {
-        require(saleActive, "PsyToken: Token Already Paused");
+        require(saleActive, "TokenSale: Token Already Paused");
         saleActive = false;
     }
 
@@ -87,8 +86,8 @@ contract TokenSale is Ownable2Step, ReentrancyGuard {
      * @dev The sale status must be set to PAUSED and the supply must be greater than 0 in order to resume the sale.
      */
     function resumeSale() external onlyOwner {
-        require(!saleActive, "PsyToken: Token Not Paused");
-        require(supply > 0, "PsyToken: Supply Finished");
+        require(!saleActive, "TokenSale: Token Not Paused");
+        require(supply > 0, "TokenSale: Supply Finished");
         saleActive = true;
     }
 
@@ -98,7 +97,7 @@ contract TokenSale is Ownable2Step, ReentrancyGuard {
      * @dev The sale status must be set to PAUSED in order to unlock the token.
      */
     function unlockToken() external onlyOwner {
-        require(tokensLocked, "PsyToken: Tokens Already Unlocked");
+        require(tokensLocked, "TokenSale: Tokens Already Unlocked");
         tokensLocked = false;
     }
 
@@ -118,7 +117,7 @@ contract TokenSale is Ownable2Step, ReentrancyGuard {
      * @dev The new price must be different from the current token price.
      */
     function setTokenPrice(uint256 _newPrice) external onlyOwner {
-        require(_newPrice != tokenPriceInDollar, "PsyToken: New Token Price Same As Current");
+        require(_newPrice != tokenPriceInDollar, "TokenSale: New Token Price Same As Current");
         tokenPriceInDollar = _newPrice;
     }
 
@@ -153,8 +152,8 @@ contract TokenSale is Ownable2Step, ReentrancyGuard {
      * @dev If the transfer fails, an error message is thrown.
      * @notice This function should be used with caution as it transfers the entire balance of the contract.
      */
-    function withdrawFundsFromContract(address _receiver) external onlyOwner {
-        require(_receiver != address(0), "TokenSale: Receiver Cannot Be Address 0");
+    function withdrawFunds(address _receiver) external onlyOwner {
+        require(_receiver != address(0), "TokenSale: Receiver Cannot Be Zero Address");
         (bool sent,) = _receiver.call{value: address(this).balance}("");
         require(sent, "Failed to send Ether");
     }

@@ -40,15 +40,27 @@ contract Treasury is Ownable2Step, ReentrancyGuard {
         core = _core;
     }
 
+    function withdrawUserFunds() external {
+        require(userBalances[msg.sender] > 0, "Treasury: User Insufficient Balance");
+        
+        uint256 amountToSend = userBalances[msg.sender];
+        userBalances[msg.sender] = 0;
+
+        (bool sent,) = msg.sender.call{value: amountToSend}("");
+        require(sent, "Failed to send Ether");
+    }
+
+    function withdrawFundsAsPsyDao(address _receiver, uint256 _amount) external onlyOwner {
+        require(_receiver != address(0), "Treasury: Receiver Cannot Be Zero Address");
+        require(address(this).balance >= _amount, "Treasury: Insufficient Balance");
+        
+        (bool sent,) = _receiver.call{value: _amount}("");
+        require(sent, "Failed to send Ether");
+    }
+
     function _calculateProRataPayout() internal returns (uint256){
         uint256 currentSupply = psyNFT.tokenId() - psyNFT.totalTokensBurnt();
         return balanceOfContract /  currentSupply; 
-    }
-
-    /// @notice Allows contract to receive NFTs
-    /// @dev Returns the valid selector to the ERC721 contract to prove contract can hold NFTs
-    function onERC721Received(address, address, uint256 _tokenId, bytes calldata) external returns (bytes4) {
-        return IERC721Receiver.onERC721Received.selector;
     }
 
     receive() external payable {

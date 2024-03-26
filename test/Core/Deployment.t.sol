@@ -13,25 +13,25 @@ contract CoreDeploymentTest is TestSetup {
 
     function test_FailsIfPsyNftIsAddressZero() public {
         vm.prank(owner);
-        vm.expectRevert("Cannot be address 0");
+        vm.expectRevert("Core: Cannot Be Zero Address");
         Core coreContract = new Core(address(0), address(sublicencesNft), address(auction), address(treasury));
     }
 
     function test_FailsIfSublicencesNftIsAddressZero() public {
         vm.prank(owner);
-        vm.expectRevert("Cannot be address 0");
+        vm.expectRevert("Core: Cannot Be Zero Address");
         Core coreContract = new Core(address(psyNFT), address(0), address(auction), address(treasury));
     }
 
     function test_FailsIfAuctionIsAddressZero() public {
         vm.prank(owner);
-        vm.expectRevert("Cannot be address 0");
+        vm.expectRevert("Core: Cannot Be Zero Address");
         Core coreContract = new Core(address(psyNFT), address(sublicencesNft), address(0), address(treasury));
     }
 
     function test_FailsIfTreasuryIsAddressZero() public {
         vm.prank(owner);
-        vm.expectRevert("Cannot be address 0");
+        vm.expectRevert("Core: Cannot Be Zero Address");
         Core coreContract = new Core(address(psyNFT), address(sublicencesNft), address(auction), address(0));
     }
 

@@ -42,7 +42,7 @@ contract ApproveTransferTest is TestSetup {
     function test_ApprovingTransferWorksCorrectly() public {
         transferNftToUser(address(alice), tokens);        
 
-        (,, uint256 initialTransferExpiryDate) = psyNFT.approvedTransfers(2);
+        (, uint256 initialTransferExpiryDate,) = psyNFT.approvedTransfers(2);
         
         assertEq(initialTransferExpiryDate, 0);
         
@@ -51,8 +51,8 @@ contract ApproveTransferTest is TestSetup {
 
         (
             uint256 tokenId, 
-            address to,
-            uint256 transferExpiryDate
+            uint256 transferExpiryDate,
+            address to
         ) = psyNFT.approvedTransfers(2);
 
         assertEq(tokenId, 2);
