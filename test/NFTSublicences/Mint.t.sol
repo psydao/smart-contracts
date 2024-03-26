@@ -27,7 +27,7 @@ contract NFTSublicencesDeploymentTest is TestSetup {
 
     function test_FailsIfMinterIsNotTokenHolder() public {
         vm.prank(address(core));
-        vm.expectRevert("Core: Not Token Holder");
+        vm.expectRevert("NFTSublicences: Not Token Holder");
         sublicencesNft.mint(address(bob), 2, 100);
     }
 
