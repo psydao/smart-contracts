@@ -36,7 +36,7 @@ contract PsyNFT is ERC721, Ownable2Step, ReentrancyGuard {
      * @dev This function can only be called once.
      */
     function initialMint() external onlyCoreContract nonReentrant {
-        require(!initialMintCalled, "Initial mint completed");
+        require(!initialMintCalled, "PsyNFT: Initial Mint Complete");
 
         initialMintCalled = true;
         previousFibonacci = 3;
@@ -58,7 +58,7 @@ contract PsyNFT is ERC721, Ownable2Step, ReentrancyGuard {
      * @dev The number of tokens to be minted is determined by the previous Fibonacci number.
      */
     function batchMintInFibonacci() external onlyCoreContract nonReentrant {
-        require(initialMintCalled, "Initial mint not completed");
+        require(initialMintCalled, "PsyNFT: Initial Mint Not Completed");
 
         uint256 batchAmount = previousFibonacci;
         previousFibonacci = tokenId;
@@ -69,6 +69,7 @@ contract PsyNFT is ERC721, Ownable2Step, ReentrancyGuard {
             batchAmount--;
         }
     }
+
     /**
      * @notice Transfers multiple NFTs to a specified recipient.
      * @dev Only the core contract can call this function.
@@ -76,8 +77,8 @@ contract PsyNFT is ERC721, Ownable2Step, ReentrancyGuard {
      * @param _recipient The address of the recipient.
      */
     function transferNFTs(uint256[] memory _tokenIds, address _recipient) external onlyCoreContract {
-        require(_recipient != address(0), "Cannot be address 0");
-        require(_tokenIds.length != 0, "No tokens to transfer");
+        require(_recipient != address(0), "PsyNFT: Recipient Cannot Be Zero Address");
+        require(_tokenIds.length != 0, "PsyNFT: Token Array Empty");
         for (uint256 x; x < _tokenIds.length; x++) {
             _safeTransfer(address(this), _recipient, _tokenIds[x]);
         }
@@ -114,7 +115,7 @@ contract PsyNFT is ERC721, Ownable2Step, ReentrancyGuard {
      * @dev The address cannot be the zero address.
      */
     function setCoreContract(address _core) external onlyOwner {
-        require(_core != address(0), "Cannot be address 0");
+        require(_core != address(0), "PsyNFT: Core Cannot Be Zero Address");
         core = _core;
     }
 
@@ -144,7 +145,7 @@ contract PsyNFT is ERC721, Ownable2Step, ReentrancyGuard {
      * @param _treasury The address of the treasury.
      */
     function setTreasury(address _treasury) external onlyOwner {
-        require(_treasury != address(0), "Cannot be address 0");
+        require(_treasury != address(0), "PsyNFT: Treasury Cannot Be Zero Address");
         treasury = _treasury;
     }
 

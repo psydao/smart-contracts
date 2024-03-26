@@ -17,7 +17,7 @@ contract SetCoreContractTest is TestSetup {
 
     function test_FailsIfCoreIsAddressZero() public {
         vm.prank(owner);
-        vm.expectRevert("Cannot be address 0");
+        vm.expectRevert("PsyNFT: Core Cannot Be Zero Address");
         psyNFT.setCoreContract(address(0));
     }
 

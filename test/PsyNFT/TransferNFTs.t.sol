@@ -25,7 +25,7 @@ contract TransferNFTsTest is TestSetup {
         tokenIds[1] = 4;
 
         vm.prank(address(core));
-        vm.expectRevert("Cannot be address 0");
+        vm.expectRevert("PsyNFT: Recipient Cannot Be Zero Address");
         psyNFT.transferNFTs(tokenIds, address(0));
     }
 
@@ -68,7 +68,7 @@ contract TransferNFTsTest is TestSetup {
         uint256[] memory tokens = new uint256[](0);
         
         vm.prank(address(core));
-        vm.expectRevert("No tokens to transfer");
+        vm.expectRevert("PsyNFT: Token Array Empty");
         psyNFT.transferNFTs(tokens, address(alice));
         vm.stopPrank();
     }

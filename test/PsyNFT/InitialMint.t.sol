@@ -17,7 +17,7 @@ contract InitialMintTest is TestSetup {
     function test_InitialMintFailsWhenAlreadyCalled() public {
          vm.startPrank(address(core));
         psyNFT.initialMint();
-        vm.expectRevert("Initial mint completed");
+        vm.expectRevert("PsyNFT: Initial Mint Complete");
         psyNFT.initialMint();
     }
 
