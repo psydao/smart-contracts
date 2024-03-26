@@ -5,7 +5,7 @@ import "../TestSetup.sol";
 import "../../src/PsyNFT.sol";
 
 
-contract DisablerageQuitTest is TestSetup {
+contract DisableRageQuitTest is TestSetup {
 
     function setUp() public {
         setUpTests();
@@ -28,11 +28,9 @@ contract DisablerageQuitTest is TestSetup {
 
         vm.startPrank(owner);
         core.enableRageQuit();
-
         assertEq(core.rageQuitAllowed(), true);
 
         core.disableRageQuit();
-
         assertEq(core.rageQuitAllowed(), false);
     }
 }
