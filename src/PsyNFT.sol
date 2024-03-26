@@ -8,8 +8,8 @@ import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 contract PsyNFT is ERC721, Ownable2Step, ReentrancyGuard {
     struct ApprovedTransfers {
         uint256 tokenId;
-        address to;
         uint256 transferExpiryDate;
+        address to;
     }
 
     uint256 public tokenId;
@@ -102,8 +102,8 @@ contract PsyNFT is ERC721, Ownable2Step, ReentrancyGuard {
 
         approvedTransfers[_tokenId] = ApprovedTransfers({
             tokenId: _tokenId,
-            to: _to,
-            transferExpiryDate: block.timestamp + _allowedTransferTimeInSeconds
+            transferExpiryDate: block.timestamp + _allowedTransferTimeInSeconds,
+            to: _to
         });
     }
 
