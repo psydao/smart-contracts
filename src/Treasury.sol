@@ -3,9 +3,10 @@ pragma solidity 0.8.20;
 
 import "./PsyNFT.sol";
 import "openzeppelin-contracts/contracts/access/Ownable2Step.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "forge-std/console.sol";
 
-contract Treasury is Ownable2Step {
+contract Treasury is Ownable2Step, ReentrancyGuard {
 
     PsyNFT public psyNFT;
 
@@ -18,7 +19,7 @@ contract Treasury is Ownable2Step {
         psyNFT = PsyNFT(_psyNFT);
     }
 
-    function exit(uint256 _tokenId, address _user) external {
+    function exit(uint256 _tokenId, address _user) external nonReentrant {
         require(_user == psyNFT.ownerOf(_tokenId), "Treasury: Not token owner");
         require(msg.sender == core, "Treasury: Only callable by Core.sol");
         

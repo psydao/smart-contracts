@@ -20,14 +20,15 @@ contract TokenSale is Ownable2Step, ReentrancyGuard {
     mapping(address => uint256) public userBalances;
 
     IERC20 public immutable psyToken;
-    AggregatorV3Interface internal dataFeed;
+    AggregatorV3Interface public dataFeed;
 
-    constructor(address _psyToken, uint256 _tokenPrice) Ownable(msg.sender) {
-        require(_psyToken != address(0), "Cannot be address 0");
+    constructor(address _psyToken, address _chainlinkPriceFeed, uint256 _tokenPrice) Ownable(msg.sender) {
+        require(_psyToken != address(0), "TokenSale: Cannot Be Address 0");
+        require(_chainlinkPriceFeed != address(0), "TokenSale: Cannot Be Address 0");
 
         //Mainnet USD/ETH price feed address
         dataFeed = AggregatorV3Interface(
-            0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419
+            _chainlinkPriceFeed
         );
 
         psyToken = IERC20(_psyToken);
@@ -45,10 +46,8 @@ contract TokenSale is Ownable2Step, ReentrancyGuard {
         require(_amountOfPsyTokens > 0, "Amount Must Be Bigger Than 0");
         require(_hasSufficientSupplyForPurchase(_amountOfPsyTokens), "PsyToken: Not enough supply");
 
-        console.log("Value sent in:", msg.value);
         uint256 ethPricePerToken = ethAmountPerPsyToken();
         uint256 ethAmount = _amountOfPsyTokens * ethPricePerToken;
-        console.log("Eth amount needed", ethAmount);
         require(msg.value == ethAmount, "ETH: Incorrect Amount Sent In");
 
         userBalances[msg.sender] += _amountOfPsyTokens;
@@ -124,6 +123,17 @@ contract TokenSale is Ownable2Step, ReentrancyGuard {
         tokenPriceInDollar = _newPrice;
     }
 
+    function updateChainlinkPriceFeed(address _newPriceFeed) external onlyOwner {
+        require(_newPriceFeed != address(0), "TokenSale: Cannot Be Address 0");
+        dataFeed = AggregatorV3Interface(_newPriceFeed);
+    }
+
+    function ethAmountPerPsyToken() public returns (uint256) {
+        uint256 dollarPricePerEth = _getDollarAmountPerEth();
+        uint256 dollarRatio = dollarPricePerEth / tokenPriceInDollar;
+        return 1 ether / dollarRatio;
+    }
+
     /**
      * @notice Checks if the contract has sufficient supply for a purchase.
      * @param _amount The amount of tokens to be purchased.
@@ -144,9 +154,5 @@ contract TokenSale is Ownable2Step, ReentrancyGuard {
         return uint256(amount) * 10**10;
     }
 
-    function ethAmountPerPsyToken() public returns (uint256) {
-        uint256 dollarPricePerEth = _getDollarAmountPerEth();
-        uint256 dollarRatio = dollarPricePerEth / tokenPriceInDollar;
-        return 1 ether / dollarRatio;
-    }
+    
 }

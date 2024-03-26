@@ -8,5 +8,6 @@
     ".gas-snapshot": "julia"
   },
   "slither.solcPath": "",
-  "slither.hiddenDetectors": []
+  "slither.hiddenDetectors": [],
+  "security.olympix.project.includePath": "/src"
 }
