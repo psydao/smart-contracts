@@ -9,5 +9,5 @@
   },
   "slither.solcPath": "",
   "slither.hiddenDetectors": [],
-  "security.olympix.project.includePath": "/src"
+  "security.olympix.project.includePath": "/src/TokenSale.sol"
 }

@@ -13,6 +13,7 @@ contract TokenSale is Ownable2Step, ReentrancyGuard {
 
     uint256 public tokenPriceInDollar;
     uint256 public supply;
+    uint256 constant ETH_AMOUNT_MULTIPLIER = 1e10;
 
     bool public saleActive;
     bool public tokensLocked;
@@ -27,9 +28,7 @@ contract TokenSale is Ownable2Step, ReentrancyGuard {
         require(_chainlinkPriceFeed != address(0), "TokenSale: Cannot Be Address 0");
 
         //Mainnet USD/ETH price feed address
-        dataFeed = AggregatorV3Interface(
-            _chainlinkPriceFeed
-        );
+        dataFeed = AggregatorV3Interface(_chainlinkPriceFeed);
 
         psyToken = IERC20(_psyToken);
         tokenPriceInDollar = _tokenPrice;
@@ -46,7 +45,7 @@ contract TokenSale is Ownable2Step, ReentrancyGuard {
         require(_amountOfPsyTokens > 0, "Amount Must Be Bigger Than 0");
         require(_hasSufficientSupplyForPurchase(_amountOfPsyTokens), "PsyToken: Not enough supply");
 
-        uint256 ethPricePerToken = ethAmountPerPsyToken();
+        uint256 ethPricePerToken = calculateEthAmountPerPsyToken();
         uint256 ethAmount = _amountOfPsyTokens * ethPricePerToken;
         require(msg.value == ethAmount, "ETH: Incorrect Amount Sent In");
 
@@ -123,15 +122,41 @@ contract TokenSale is Ownable2Step, ReentrancyGuard {
         tokenPriceInDollar = _newPrice;
     }
 
+    /**
+     * @notice Updates the Chainlink price feed address used for calculating the amount of Ether required to purchase one PsyToken.
+     * @param _newPriceFeed The new address of the Chainlink price feed.
+     * @notice This function updates the dataFeed variable with the new Chainlink price feed address.
+     */
     function updateChainlinkPriceFeed(address _newPriceFeed) external onlyOwner {
         require(_newPriceFeed != address(0), "TokenSale: Cannot Be Address 0");
         dataFeed = AggregatorV3Interface(_newPriceFeed);
     }
 
-    function ethAmountPerPsyToken() public returns (uint256) {
+    /**
+     * @notice Calculates the amount of Ether required to purchase one PsyToken.
+     * @dev The token price in USDC must be greater than 0.
+     * @return The amount of Ether required to purchase one PsyToken, multiplied by ETH_AMOUNT_MULTIPLIER.
+     */
+    function calculateEthAmountPerPsyToken() public returns (uint256) {
+        require(tokenPriceInDollar != 0, "TokenSale: Token Is Free");
+
         uint256 dollarPricePerEth = _getDollarAmountPerEth();
-        uint256 dollarRatio = dollarPricePerEth / tokenPriceInDollar;
-        return 1 ether / dollarRatio;
+        uint256 ethAmount = tokenPriceInDollar / dollarPricePerEth;
+
+        return ethAmount * ETH_AMOUNT_MULTIPLIER;
+    }
+
+    /**
+     * @notice Withdraws the contract's balance and sends it to the specified receiver address.
+     * @param _receiver: The address to which the contract's balance will be sent.
+     * @dev Only the contract owner can call this function.
+     * @dev If the transfer fails, an error message is thrown.
+     * @notice This function should be used with caution as it transfers the entire balance of the contract.
+     */
+    function withdrawFundsFromContract(address _receiver) external onlyOwner {
+        require(_receiver != address(0), "TokenSale: Receiver Cannot Be Address 0");
+        (bool sent,) = _receiver.call{value: address(this).balance}("");
+        require(sent, "Failed to send Ether");
     }
 
     /**
@@ -143,16 +168,13 @@ contract TokenSale is Ownable2Step, ReentrancyGuard {
         return (supply >= _amount);
     }
 
+    /**
+     * @notice Retrieves the latest dollar amount per Ether from the Chainlink price feed.
+     * @dev This function calls the latestRoundData() function of the dataFeed contract to get the latest round data.
+     * @return The dollar amount per Ether as an unsigned integer.
+     */
     function _getDollarAmountPerEth() internal returns (uint256) {
-        (
-            /* uint80 roundID */,
-            int amount,
-            /*uint startedAt*/,
-            /*uint timeStamp*/,
-            /*uint80 answeredInRound*/
-        ) = dataFeed.latestRoundData();
-        return uint256(amount) * 10**10;
+        (, int256 amount,,,) = dataFeed.latestRoundData();
+        return uint256(amount);
     }
-
-    
 }

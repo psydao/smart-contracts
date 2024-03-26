@@ -20,7 +20,7 @@ contract BuyTokensTest is TestSetup {
         vm.prank(owner);
         tokenSale.setSupply();
 
-        uint256 amountAliceMustPay = tokenSale.ethAmountPerPsyToken() * 9;
+        uint256 amountAliceMustPay = tokenSale.calculateEthAmountPerPsyToken() * 9;
 
         vm.startPrank(alice);
         vm.expectRevert("PsyToken: Not enough supply");
@@ -44,7 +44,7 @@ contract BuyTokensTest is TestSetup {
         tokenSale.pauseSale();
         vm.stopPrank();
 
-        uint256 amountAliceMustPay = tokenSale.ethAmountPerPsyToken() * 10;
+        uint256 amountAliceMustPay = tokenSale.calculateEthAmountPerPsyToken() * 10;
 
         vm.startPrank(alice);
         vm.expectRevert("PsyToken: Sale Paused");
@@ -76,7 +76,7 @@ contract BuyTokensTest is TestSetup {
 
         assertEq(psyToken.balanceOf(address(alice)), 0);
 
-        uint256 amountAliceMustPay = tokenSale.ethAmountPerPsyToken() * 9;
+        uint256 amountAliceMustPay = tokenSale.calculateEthAmountPerPsyToken() * 9;
 
         vm.startPrank(alice);
         tokenSale.buyTokens{value: amountAliceMustPay}(9);
@@ -96,7 +96,7 @@ contract BuyTokensTest is TestSetup {
 
         assertEq(tokenSale.saleActive(), true);
 
-        uint256 amountAliceMustPay = tokenSale.ethAmountPerPsyToken() * 9;
+        uint256 amountAliceMustPay = tokenSale.calculateEthAmountPerPsyToken() * 9;
 
         vm.startPrank(alice);
         tokenSale.buyTokens{value: amountAliceMustPay}(9);

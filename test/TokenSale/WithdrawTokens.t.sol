@@ -70,19 +70,19 @@ contract WithdrawTokensTest is TestSetup {
         vm.prank(owner);
         tokenSale.setSupply();
         
-        uint256 amountAliceMustPay = tokenSale.ethAmountPerPsyToken() * 10;
+        uint256 amountAliceMustPay = tokenSale.calculateEthAmountPerPsyToken() * 10;
 
         vm.startPrank(alice);
         tokenSale.buyTokens{value: amountAliceMustPay}(10);
         vm.stopPrank();
 
-        uint256 amountOwnerMustPay = tokenSale.ethAmountPerPsyToken() * 50;
+        uint256 amountOwnerMustPay = tokenSale.calculateEthAmountPerPsyToken() * 50;
 
         vm.startPrank(owner);
         tokenSale.buyTokens{value: amountOwnerMustPay}(50);
         vm.stopPrank();
 
-        uint256 amountBobMustPay = tokenSale.ethAmountPerPsyToken() * 15;
+        uint256 amountBobMustPay = tokenSale.calculateEthAmountPerPsyToken() * 15;
 
         vm.startPrank(bob);
         tokenSale.buyTokens{value: amountBobMustPay}(15);
