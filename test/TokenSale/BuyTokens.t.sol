@@ -4,8 +4,13 @@ pragma solidity 0.8.20;
 import "../TestSetup.sol";
 
 contract BuyTokensTest is TestSetup {
+    uint256 sepoliaFork;
+    uint256 mainnetFork;
+    string SEPOLIA_RPC_URL = vm.envString("SEPOLIA_RPC_URL");
+    string MAINNET_RPC_URL = vm.envString("MAINNET_RPC_URL");
 
     function setUp() public {
+        setupFork();
         setUpTests();
         vm.deal(alice, 100 ether);
     }
@@ -15,9 +20,11 @@ contract BuyTokensTest is TestSetup {
         vm.prank(owner);
         tokenSale.setSupply();
 
+        uint256 amountAliceMustPay = tokenSale.calculateEthAmountPerPsyToken() * 9;
+
         vm.startPrank(alice);
         vm.expectRevert("PsyToken: Not enough supply");
-        tokenSale.buyTokens{value: 0.9 ether}(9);
+        tokenSale.buyTokens{value: amountAliceMustPay}(9);
     }
 
     function test_FailsIfUserSendsIncorrectEthAmount() public {
@@ -37,9 +44,11 @@ contract BuyTokensTest is TestSetup {
         tokenSale.pauseSale();
         vm.stopPrank();
 
+        uint256 amountAliceMustPay = tokenSale.calculateEthAmountPerPsyToken() * 10;
+
         vm.startPrank(alice);
         vm.expectRevert("PsyToken: Sale Paused");
-        tokenSale.buyTokens{value: 1 ether}(10);
+        tokenSale.buyTokens{value: amountAliceMustPay}(10);
     }
 
     function test_FailsIfPurchasingZeroTokens() public {
@@ -67,14 +76,16 @@ contract BuyTokensTest is TestSetup {
 
         assertEq(psyToken.balanceOf(address(alice)), 0);
 
+        uint256 amountAliceMustPay = tokenSale.calculateEthAmountPerPsyToken() * 9;
+
         vm.startPrank(alice);
-        tokenSale.buyTokens{value: 0.9 ether}(9);
+        tokenSale.buyTokens{value: amountAliceMustPay}(9);
 
         assertEq(tokenSale.supply(), 1);
-        assertEq(address(tokenSale).balance, 0.9 ether);
+        assertEq(address(tokenSale).balance, amountAliceMustPay);
         assertEq(tokenSale.userBalances(address(alice)), 9);
         assertEq(psyToken.balanceOf(address(alice)), 0);
-        assertEq(address(alice).balance, aliceEthBalanceBefore - 0.9 ether);
+        assertEq(address(alice).balance, aliceEthBalanceBefore - amountAliceMustPay);
     }
 
     function test_SalePausedIfSupplyRunsOut() public {
@@ -85,8 +96,16 @@ contract BuyTokensTest is TestSetup {
 
         assertEq(tokenSale.saleActive(), true);
 
+        uint256 amountAliceMustPay = tokenSale.calculateEthAmountPerPsyToken() * 9;
+
         vm.startPrank(alice);
-        tokenSale.buyTokens{value: 0.9 ether}(9);
+        tokenSale.buyTokens{value: amountAliceMustPay}(9);
         assertEq(tokenSale.saleActive(), false);
+    }
+
+    function setupFork() public {
+        sepoliaFork = vm.createFork(SEPOLIA_RPC_URL);
+        mainnetFork = vm.createFork(MAINNET_RPC_URL);
+        vm.selectFork(mainnetFork);
     }
 }

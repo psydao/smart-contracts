@@ -25,7 +25,8 @@ contract Core is Ownable2Step {
         psyNFT = PsyNFT(_psyNFT);
         nftSublicenses = NFTSublicences(_sublicenseNFT);
         treasury = Treasury(payable(_treasury));
-        auctionContract = _auction;
+        auctionContract = _auction;  
+        rageQuitAllowed = false;
     }
 
     /**

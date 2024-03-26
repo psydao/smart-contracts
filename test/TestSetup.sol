@@ -30,7 +30,7 @@ contract TestSetup is Test {
     address alice = vm.addr(2);
     address bob = vm.addr(3);
     address robyn = vm.addr(4);
-
+    address chainlinkMainnetPriceFeed = 0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419;
     uint256 ONE_DAY = 86400;
 
     function setUpTests() public {
@@ -41,7 +41,7 @@ contract TestSetup is Test {
         treasury = new Treasury(address(psyNFT));
         core = new Core(address(psyNFT), address(sublicencesNft), address(auction), address(treasury));
         psyToken = new TestPsyToken("TestPsy", "PSY");
-        tokenSale = new TokenSale(address(psyToken), 0.1 ether);
+        tokenSale = new TokenSale(address(psyToken), chainlinkMainnetPriceFeed, 0.1 ether);
         psyNFT.setCoreContract(address(core));
         sublicencesNft.setCoreContract(address(core));
         psyNFT.setTreasury(address(treasury));

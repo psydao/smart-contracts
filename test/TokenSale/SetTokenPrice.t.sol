@@ -22,9 +22,9 @@ contract SetTokenPrice is TestSetup {
     }
 
     function test_TokenPriceCorrectlyUpdates() public {
-        assertEq(tokenSale.tokenPriceInETH(), 0.1 ether);
+        assertEq(tokenSale.tokenPriceInDollar(), 0.1 ether);
         vm.startPrank(owner);
         tokenSale.setTokenPrice(10 ether);
-        assertEq(tokenSale.tokenPriceInETH(), 10 ether);
+        assertEq(tokenSale.tokenPriceInDollar(), 10 ether);
     }
 }

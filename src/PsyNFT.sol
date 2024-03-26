@@ -22,6 +22,8 @@ contract PsyNFT is ERC721, Ownable2Step, ReentrancyGuard {
     bool public initialMintCalled;
     bool public controlledTransfers;
 
+    string public baseUri;
+
     mapping(uint256 => ApprovedTransfers) public approvedTransfers;
 
     constructor() ERC721("PsyNFT", "PSY") Ownable(msg.sender) {
@@ -177,10 +179,18 @@ contract PsyNFT is ERC721, Ownable2Step, ReentrancyGuard {
         _burn(_tokenId);
     }
 
+    function setBaseUri(string memory _uri) external onlyOwner {
+        baseUri = _uri;
+    }
+
     /// @notice Allows contract to receive NFTs
     /// @dev Returns the valid selector to the ERC721 contract to prove contract can hold NFTs
     function onERC721Received(address, address, uint256 _tokenId, bytes calldata) external returns (bytes4) {
         return IERC721Receiver.onERC721Received.selector;
+    }
+
+    function _baseURI() internal view override returns (string memory) {
+        return baseUri;
     }
 
     modifier onlyCoreContract() {

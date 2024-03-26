@@ -5,7 +5,13 @@ import "../TestSetup.sol";
 
 contract WithdrawTokensTest is TestSetup {
 
+    uint256 sepoliaFork;
+    uint256 mainnetFork;
+    string SEPOLIA_RPC_URL = vm.envString("SEPOLIA_RPC_URL");
+    string MAINNET_RPC_URL = vm.envString("MAINNET_RPC_URL");
+
     function setUp() public {
+        setupFork();
         setUpTests();
         buyTokensForUsers();
     }
@@ -63,23 +69,35 @@ contract WithdrawTokensTest is TestSetup {
 
         vm.prank(owner);
         tokenSale.setSupply();
+        
+        uint256 amountAliceMustPay = tokenSale.calculateEthAmountPerPsyToken() * 10;
 
         vm.startPrank(alice);
-        tokenSale.buyTokens{value: 1 ether}(10);
+        tokenSale.buyTokens{value: amountAliceMustPay}(10);
         vm.stopPrank();
+
+        uint256 amountOwnerMustPay = tokenSale.calculateEthAmountPerPsyToken() * 50;
 
         vm.startPrank(owner);
-        tokenSale.buyTokens{value: 5 ether}(50);
+        tokenSale.buyTokens{value: amountOwnerMustPay}(50);
         vm.stopPrank();
+
+        uint256 amountBobMustPay = tokenSale.calculateEthAmountPerPsyToken() * 15;
 
         vm.startPrank(bob);
-        tokenSale.buyTokens{value: 1.5 ether}(15);
+        tokenSale.buyTokens{value: amountBobMustPay}(15);
         vm.stopPrank();
 
-        assertEq(address(tokenSale).balance, 7.5 ether);
+        assertEq(address(tokenSale).balance, amountAliceMustPay + amountOwnerMustPay + amountBobMustPay);
         assertEq(tokenSale.userBalances(address(alice)), 10);
         assertEq(tokenSale.userBalances(address(owner)), 50);
         assertEq(tokenSale.userBalances(address(bob)), 15);
         assertEq(psyToken.balanceOf(address(tokenSale)), 100);
+    }
+
+    function setupFork() public {
+        sepoliaFork = vm.createFork(SEPOLIA_RPC_URL);
+        mainnetFork = vm.createFork(MAINNET_RPC_URL);
+        vm.selectFork(mainnetFork);
     }
 }
