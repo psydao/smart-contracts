@@ -152,7 +152,7 @@ contract TokenSale is Ownable2Step, ReentrancyGuard {
      * @dev If the transfer fails, an error message is thrown.
      * @notice This function should be used with caution as it transfers the entire balance of the contract.
      */
-    function withdrawFundsFromContract(address _receiver) external onlyOwner {
+    function withdrawFunds(address _receiver) external onlyOwner {
         require(_receiver != address(0), "TokenSale: Receiver Cannot Be Zero Address");
         (bool sent,) = _receiver.call{value: address(this).balance}("");
         require(sent, "Failed to send Ether");
