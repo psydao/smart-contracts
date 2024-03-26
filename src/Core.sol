@@ -37,7 +37,7 @@ contract Core is Ownable2Step {
      * @dev If rage quit is already enabled, this function will revert.
      */
     function enableRageQuit() external onlyOwner {
-        require(!rageQuitAllowed, "Treasury: Rage Quit Already Enabled");
+        require(!rageQuitAllowed, "Core: Rage Quit Already Enabled");
         rageQuitAllowed = true;
     }
 
@@ -48,10 +48,11 @@ contract Core is Ownable2Step {
      * @dev If rage quit is already disabled, this function will revert.
      */
     function disableRageQuit() external onlyOwner {
-        require(rageQuitAllowed, "Treasury: Rage Quit Already Disabled");
+        require(rageQuitAllowed, "Core: Rage Quit Already Disabled");
         rageQuitAllowed = false;
     }
 
+    
     // --------------------------------------------------------------------------------------------------------------------
     // -----------------------------------------------> PSY NFT FUNCTIONS <------------------------------------------------
     // --------------------------------------------------------------------------------------------------------------------
