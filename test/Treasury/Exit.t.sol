@@ -19,9 +19,13 @@ contract ExitTest is TestSetup {
         tokensForAlice[2] = 3;
 
         transferNftToUser(address(alice), tokensForAlice);
+
+        vm.deal(address(alice), 10 ether);
+        vm.prank(alice);
+        (bool sent, ) = address(treasury).call{value: 5 ether}("");
     }
 
-    function test_FailsIfNotTokenOwner() public {
+    function test_FailsIfUserIsNotTokenOwner() public {
         vm.prank(address(core));
         vm.expectRevert("Treasury: Not token owner");
         treasury.exit(0, address(owner));
@@ -35,16 +39,12 @@ contract ExitTest is TestSetup {
 
     function test_RageQuitWorksPerfectly() public {
 
-        vm.deal(address(alice), 10 ether);
-        vm.prank(alice);
-        (bool sent, ) = address(treasury).call{value: 5 ether}("");
-
         assertEq(address(treasury).balance, 5 ether);
         assertEq(psyNFT.tokenId(), 5);
         uint256 aliceBalance = address(alice).balance;
 
         assertEq(psyNFT.ownerOf(0), address(alice));
-        uint256 treasuryPortion = treasury.balanceOfContract() / psyNFT.tokenId();
+        uint256 treasuryPortion = treasury.ethBalance() / psyNFT.tokenId();
 
         vm.prank(address(core));
         treasury.exit(0, address(alice));

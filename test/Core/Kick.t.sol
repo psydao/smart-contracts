@@ -35,7 +35,7 @@ contract KickTest is TestSetup {
         uint256 aliceBalance = address(alice).balance;
 
         assertEq(psyNFT.ownerOf(0), address(alice));
-        uint256 treasuryPortion = treasury.balanceOfContract() / psyNFT.tokenId();
+        uint256 treasuryPortion = treasury.ethBalance() / psyNFT.tokenId();
 
         vm.prank(address(owner));
         core.kick(0, address(alice));
