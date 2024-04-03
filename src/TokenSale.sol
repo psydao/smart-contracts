@@ -117,6 +117,11 @@ contract TokenSale is Ownable2Step, ReentrancyGuard {
         emit TokenUnlocked();
     }
 
+    /**
+     * @notice Deposits a specified amount of PsyTokens into the contract for sale.
+     * @Param _amountToDeposit The amount of PsyTokens to deposit for sale.
+     * @dev The sale status must be set to PAUSED in order to unlock the token.
+     */
     function depositPsyTokensForSale(uint256 _amountToDeposit) external onlyOwner {
         totalTokensForSale += _amountToDeposit;
         psyToken.safeTransferFrom(msg.sender, address(this), _amountToDeposit);
