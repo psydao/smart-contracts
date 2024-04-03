@@ -8,16 +8,17 @@ contract WithdrawFundsFromContractTest is TestSetup {
     string MAINNET_RPC_URL = vm.envString("MAINNET_RPC_URL");
 
     function setUp() public {
-        setupFork();
+        setUpFork();
         setUpTests();
         vm.deal(alice, 100 ether);
     }
 
     function test_FailsIfReceiverIsAddressZero() public {
-        psyToken.mint(address(tokenSale), 10);
-
-        vm.prank(owner);
-        tokenSale.setSupply();
+        psyToken.mint(address(owner), 10 ether);
+        vm.startPrank(owner);
+        psyToken.approve(address(tokenSale), 10 ether);
+        tokenSale.depositPsyTokensForSale(10);
+        vm.stopPrank();
 
         uint256 amountAliceMustPay = tokenSale.calculateEthAmountPerPsyToken() * 9;
 
@@ -30,10 +31,11 @@ contract WithdrawFundsFromContractTest is TestSetup {
     }
 
     function test_FailsIfCallerIsnotContractOwner() public {
-        psyToken.mint(address(tokenSale), 10);
-
-        vm.prank(owner);
-        tokenSale.setSupply();
+        psyToken.mint(address(owner), 10 ether);
+        vm.startPrank(owner);
+        psyToken.approve(address(tokenSale), 10 ether);
+        tokenSale.depositPsyTokensForSale(10);
+        vm.stopPrank();
 
         uint256 amountAliceMustPay = tokenSale.calculateEthAmountPerPsyToken() * 9;
 
@@ -46,10 +48,11 @@ contract WithdrawFundsFromContractTest is TestSetup {
     }
 
     function test_WithdrawsEthToOwner() public {
-        psyToken.mint(address(tokenSale), 10);
-
-        vm.prank(owner);
-        tokenSale.setSupply();
+        psyToken.mint(address(owner), 10 ether);
+        vm.startPrank(owner);
+        psyToken.approve(address(tokenSale), 10 ether);
+        tokenSale.depositPsyTokensForSale(10);
+        vm.stopPrank();
 
         uint256 amountAliceMustPay = tokenSale.calculateEthAmountPerPsyToken() * 9;
 
@@ -66,7 +69,7 @@ contract WithdrawFundsFromContractTest is TestSetup {
         assertEq(address(owner).balance, ownerBalanceBeforeTransfer + amountAliceMustPay);
     }
 
-    function setupFork() public {
+    function setUpFork() public {
         mainnetFork = vm.createFork(MAINNET_RPC_URL);
         vm.selectFork(mainnetFork);
     }

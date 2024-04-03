@@ -10,7 +10,7 @@ contract CalculateEthAmountPerPsyTokenTest is TestSetup {
 
 
     function setUp() public {
-        setupFork();
+        setUpFork();
         setUpTests();
     }
 
@@ -19,7 +19,7 @@ contract CalculateEthAmountPerPsyTokenTest is TestSetup {
         console.log("Psy price in ETH at block 11_493_383 was: ", tokenPriceInEth);
     }
 
-    function setupFork() public {
+    function setUpFork() public {
         mainnetFork = vm.createFork(MAINNET_RPC_URL);
         vm.selectFork(mainnetFork);
         vm.rollFork(11_493_383);

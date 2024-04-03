@@ -10,11 +10,12 @@ contract ResumeSaleTest is TestSetup {
     }
 
     function test_FailsIfNotOwner() public {
-        psyToken.mint(address(tokenSale), 10e18);
-        
+        psyToken.mint(address(owner), 10 ether);
         vm.startPrank(owner);
+        psyToken.approve(address(tokenSale), 10 ether);
+        tokenSale.depositPsyTokensForSale(10 ether);
         tokenSale.pauseSale();
-        tokenSale.setSupply();
+        vm.stopPrank();
 
         vm.startPrank(alice);
         vm.expectRevert(abi.encodeWithSelector(OwnableUnauthorizedAccount.selector, address(alice)));
@@ -22,10 +23,10 @@ contract ResumeSaleTest is TestSetup {
     }
 
     function test_FailsIfSaleNotPaused() public {
-        psyToken.mint(address(tokenSale), 10e18);
-
+        psyToken.mint(address(owner), 10 ether);
         vm.startPrank(owner);
-        tokenSale.setSupply();
+        psyToken.approve(address(tokenSale), 10 ether);
+        tokenSale.depositPsyTokensForSale(10 ether);
 
         vm.expectRevert("TokenSale: Token Not Paused");
         tokenSale.resumeSale();
@@ -39,11 +40,14 @@ contract ResumeSaleTest is TestSetup {
     }
 
     function test_SaleSuccessfullyResumes() public {
-        psyToken.mint(address(tokenSale), 10e18);
+        psyToken.mint(address(owner), 10 ether);
+        vm.startPrank(owner);
+        psyToken.approve(address(tokenSale), 10 ether);
+        tokenSale.depositPsyTokensForSale(10 ether);
+        vm.stopPrank();
 
         assertEq(tokenSale.saleActive(), true);
         vm.startPrank(owner);
-        tokenSale.setSupply();
         tokenSale.pauseSale();
         tokenSale.resumeSale();
         assertEq(tokenSale.saleActive(), true);

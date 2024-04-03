@@ -10,15 +10,16 @@ contract BuyTokensTest is TestSetup {
     string MAINNET_RPC_URL = vm.envString("MAINNET_RPC_URL");
 
     function setUp() public {
-        setupFork();
+        setUpFork();
         setUpTests();
         vm.deal(alice, 100 ether);
     }
 
     function test_FailsIfNotEnoughSupply() public {
-        psyToken.mint(address(tokenSale), 1);
-        vm.prank(owner);
-        tokenSale.setSupply();
+        psyToken.mint(address(owner), 1 ether);
+        vm.startPrank(owner);
+        psyToken.approve(address(tokenSale), 1 ether);
+        tokenSale.depositPsyTokensForSale(1);
 
         uint256 amountAliceMustPay = tokenSale.calculateEthAmountPerPsyToken() * 9;
 
@@ -28,9 +29,10 @@ contract BuyTokensTest is TestSetup {
     }
 
     function test_FailsIfUserSendsIncorrectEthAmount() public {
-        psyToken.mint(address(tokenSale), 10);
-        vm.prank(owner);
-        tokenSale.setSupply();
+        psyToken.mint(address(owner), 1 ether);
+        vm.startPrank(owner);
+        psyToken.approve(address(tokenSale), 1 ether);
+        tokenSale.depositPsyTokensForSale(10);
 
         vm.startPrank(alice);
         vm.expectRevert("TokenSale: Incorrect Amount Sent In");
@@ -38,9 +40,10 @@ contract BuyTokensTest is TestSetup {
     }
 
     function test_FailsIfSaleIsPaused() public {
-        psyToken.mint(address(tokenSale), 10);
+        psyToken.mint(address(owner), 1 ether);
         vm.startPrank(owner);
-        tokenSale.setSupply();
+        psyToken.approve(address(tokenSale), 1 ether);
+        tokenSale.depositPsyTokensForSale(10);
         tokenSale.pauseSale();
         vm.stopPrank();
 
@@ -52,9 +55,10 @@ contract BuyTokensTest is TestSetup {
     }
 
     function test_FailsIfPurchasingZeroTokens() public {
-        psyToken.mint(address(tokenSale), 10);
-        vm.prank(owner);
-        tokenSale.setSupply();
+        psyToken.mint(address(owner), 1 ether);
+        vm.startPrank(owner);
+        psyToken.approve(address(tokenSale), 1 ether);
+        tokenSale.depositPsyTokensForSale(10);
 
         vm.startPrank(alice);
         vm.expectRevert("TokenSale: Amount Must Be Bigger Than 0");
@@ -66,13 +70,12 @@ contract BuyTokensTest is TestSetup {
         uint256 aliceEthBalanceBefore = address(alice).balance;
         assertEq(aliceEthBalanceBefore, 100 ether);
 
-        psyToken.mint(address(tokenSale), 10);
+        psyToken.mint(address(owner), 1 ether);
+        vm.startPrank(owner);
+        psyToken.approve(address(tokenSale), 1 ether);
+        tokenSale.depositPsyTokensForSale(10);
         assertEq(psyToken.balanceOf(address(tokenSale)), 10);
-
-        assertEq(tokenSale.supply(), 0);
-        vm.prank(owner);
-        tokenSale.setSupply();
-        assertEq(tokenSale.supply(), 10);
+        assertEq(tokenSale.totalTokensForSale(), 10);
 
         assertEq(psyToken.balanceOf(address(alice)), 0);
 
@@ -81,7 +84,7 @@ contract BuyTokensTest is TestSetup {
         vm.startPrank(alice);
         tokenSale.buyTokens{value: amountAliceMustPay}(9);
 
-        assertEq(tokenSale.supply(), 1);
+        assertEq(tokenSale.totalTokensForSale(), 1);
         assertEq(address(tokenSale).balance, amountAliceMustPay);
         assertEq(tokenSale.userBalances(address(alice)), 9);
         assertEq(psyToken.balanceOf(address(alice)), 0);
@@ -89,10 +92,10 @@ contract BuyTokensTest is TestSetup {
     }
 
     function test_SalePausedIfSupplyRunsOut() public {
-        psyToken.mint(address(tokenSale), 9);
-
-        vm.prank(owner);
-        tokenSale.setSupply();
+        psyToken.mint(address(owner), 1 ether);
+        vm.startPrank(owner);
+        psyToken.approve(address(tokenSale), 1 ether);
+        tokenSale.depositPsyTokensForSale(9);
 
         assertEq(tokenSale.saleActive(), true);
 
@@ -103,7 +106,7 @@ contract BuyTokensTest is TestSetup {
         assertEq(tokenSale.saleActive(), false);
     }
 
-    function setupFork() public {
+    function setUpFork() public {
         sepoliaFork = vm.createFork(SEPOLIA_RPC_URL);
         mainnetFork = vm.createFork(MAINNET_RPC_URL);
         vm.selectFork(mainnetFork);
