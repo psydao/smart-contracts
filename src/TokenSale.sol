@@ -122,6 +122,10 @@ contract TokenSale is Ownable2Step, ReentrancyGuard {
      * @dev Only the contract owner can call this function.
      * @dev The supply is set to the balance of PsyTokens held by the contract.
      */
+
+    // Someone can call this function after users have purchased but havent claimed
+    // This would mean the supply gets set back to the original balance allowing a purchase of all the original tokens
+    // although they users have already purchased and are owed tokens. RELOOK AT THIS LOGIC
     function setSupply() external onlyOwner {
         supply = psyToken.balanceOf(address(this));
     }
