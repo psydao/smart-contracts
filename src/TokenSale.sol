@@ -22,6 +22,12 @@ contract TokenSale is Ownable2Step, ReentrancyGuard {
     IERC20 public immutable psyToken;
     AggregatorV3Interface public dataFeed;
 
+    event TokensBought(address buyer, uint256 amount);
+    event TokensWithdrawn(address withdrawer, uint256 amount);
+    event SalePaused();
+    event SaleResumed();
+    event TokenUnlocked();
+
     constructor(address _psyToken, address _chainlinkPriceFeed, uint256 _tokenPrice) Ownable(msg.sender) {
         require(_psyToken != address(0), "TokenSale: Cannot Be Zero Address");
         require(_chainlinkPriceFeed != address(0), "TokenSale: Cannot Be Zero Address");
@@ -54,6 +60,8 @@ contract TokenSale is Ownable2Step, ReentrancyGuard {
         if (supply == 0) {
             saleActive = false;
         }
+
+        emit TokensBought(msg.sender, _amountOfPsyTokens);
     }
 
     /**
@@ -68,6 +76,8 @@ contract TokenSale is Ownable2Step, ReentrancyGuard {
         userBalances[msg.sender] = 0;
 
         psyToken.safeTransfer(msg.sender, amount);
+
+        emit TokensWithdrawn(msg.sender, amount);
     }
 
     /**
@@ -78,6 +88,8 @@ contract TokenSale is Ownable2Step, ReentrancyGuard {
     function pauseSale() external onlyOwner {
         require(saleActive, "TokenSale: Token Already Paused");
         saleActive = false;
+
+        emit SalePaused();
     }
 
     /**
@@ -89,6 +101,8 @@ contract TokenSale is Ownable2Step, ReentrancyGuard {
         require(!saleActive, "TokenSale: Token Not Paused");
         require(supply > 0, "TokenSale: Supply Finished");
         saleActive = true;
+
+        emit SalePaused();
     }
 
     /**
@@ -99,6 +113,8 @@ contract TokenSale is Ownable2Step, ReentrancyGuard {
     function unlockToken() external onlyOwner {
         require(tokensLocked, "TokenSale: Tokens Already Unlocked");
         tokensLocked = false;
+
+        emit TokenUnlocked();
     }
 
     /**
@@ -106,6 +122,10 @@ contract TokenSale is Ownable2Step, ReentrancyGuard {
      * @dev Only the contract owner can call this function.
      * @dev The supply is set to the balance of PsyTokens held by the contract.
      */
+
+    // Someone can call this function after users have purchased but havent claimed
+    // This would mean the supply gets set back to the original balance allowing a purchase of all the original tokens
+    // although they users have already purchased and are owed tokens. RELOOK AT THIS LOGIC
     function setSupply() external onlyOwner {
         supply = psyToken.balanceOf(address(this));
     }
