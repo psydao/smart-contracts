@@ -11,7 +11,7 @@ contract TokenSale is Ownable2Step, ReentrancyGuard {
     using SafeERC20 for IERC20;
 
     uint256 public tokenPriceInDollar;
-    uint256 public supply;
+    uint256 public totalTokensForSale;
     uint256 constant ETH_AMOUNT_MULTIPLIER = 1e10;
 
     bool public saleActive;
@@ -55,9 +55,9 @@ contract TokenSale is Ownable2Step, ReentrancyGuard {
         require(msg.value == ethAmount, "TokenSale: Incorrect Amount Sent In");
 
         userBalances[msg.sender] += _amountOfPsyTokens;
-        supply -= _amountOfPsyTokens;
+        totalTokensForSale -= _amountOfPsyTokens;
 
-        if (supply == 0) {
+        if (totalTokensForSale == 0) {
             saleActive = false;
         }
 
@@ -95,11 +95,11 @@ contract TokenSale is Ownable2Step, ReentrancyGuard {
     /**
      * @notice Resumes the token sale.
      * @dev Only the contract owner can call this function.
-     * @dev The sale status must be set to PAUSED and the supply must be greater than 0 in order to resume the sale.
+     * @dev The sale status must be set to PAUSED and the totalTokensForSale must be greater than 0 in order to resume the sale.
      */
     function resumeSale() external onlyOwner {
         require(!saleActive, "TokenSale: Token Not Paused");
-        require(supply > 0, "TokenSale: Supply Finished");
+        require(totalTokensForSale > 0, "TokenSale: Supply Finished");
         saleActive = true;
 
         emit SalePaused();
@@ -118,16 +118,13 @@ contract TokenSale is Ownable2Step, ReentrancyGuard {
     }
 
     /**
-     * @notice Sets the supply of PsyTokens.
-     * @dev Only the contract owner can call this function.
-     * @dev The supply is set to the balance of PsyTokens held by the contract.
+     * @notice Deposits a specified amount of PsyTokens into the contract for sale.
+     * @param _amountToDeposit The amount of PsyTokens to deposit for sale.
+     * @dev The sale status must be set to PAUSED in order to unlock the token.
      */
-
-    // Someone can call this function after users have purchased but havent claimed
-    // This would mean the supply gets set back to the original balance allowing a purchase of all the original tokens
-    // although they users have already purchased and are owed tokens. RELOOK AT THIS LOGIC
-    function setSupply() external onlyOwner {
-        supply = psyToken.balanceOf(address(this));
+    function depositPsyTokensForSale(uint256 _amountToDeposit) external onlyOwner {
+        totalTokensForSale += _amountToDeposit;
+        psyToken.safeTransferFrom(msg.sender, address(this), _amountToDeposit);
     }
 
     /**
@@ -184,7 +181,7 @@ contract TokenSale is Ownable2Step, ReentrancyGuard {
      * @return A boolean indicating whether the contract has sufficient supply for the purchase.
      */
     function _hasSufficientSupplyForPurchase(uint256 _amount) internal view returns (bool) {
-        return (supply >= _amount);
+        return (totalTokensForSale >= _amount);
     }
 
     /**

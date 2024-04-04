@@ -11,7 +11,7 @@ contract WithdrawTokensTest is TestSetup {
     string MAINNET_RPC_URL = vm.envString("MAINNET_RPC_URL");
 
     function setUp() public {
-        setupFork();
+        setUpFork();
         setUpTests();
         buyTokensForUsers();
     }
@@ -46,10 +46,10 @@ contract WithdrawTokensTest is TestSetup {
         assertEq(psyToken.balanceOf(address(tokenSale)), 90);
         assertEq(tokenSale.userBalances(address(alice)), 0);
 
-        assertEq(psyToken.balanceOf(address(owner)), 0);
+        assertEq(psyToken.balanceOf(address(owner)), 10 ether - 100);
         vm.prank(owner);
         tokenSale.withdrawTokens();
-        assertEq(psyToken.balanceOf(address(owner)), 50);
+        assertEq(psyToken.balanceOf(address(owner)), 10 ether - 50);
         assertEq(psyToken.balanceOf(address(tokenSale)), 40);
         assertEq(tokenSale.userBalances(address(owner)), 0);
 
@@ -62,14 +62,16 @@ contract WithdrawTokensTest is TestSetup {
     }
 
     function buyTokensForUsers() public {
-        psyToken.mint(address(tokenSale), 100);
+        psyToken.mint(address(owner), 10 ether);
+        vm.startPrank(owner);
+        psyToken.approve(address(tokenSale), 10 ether);
+        tokenSale.depositPsyTokensForSale(100);
+        vm.stopPrank();
+        
         vm.deal(alice, 100 ether);
         vm.deal(bob, 100 ether);
         vm.deal(owner, 100 ether);
 
-        vm.prank(owner);
-        tokenSale.setSupply();
-        
         uint256 amountAliceMustPay = tokenSale.calculateEthAmountPerPsyToken() * 10;
 
         vm.startPrank(alice);
@@ -95,7 +97,7 @@ contract WithdrawTokensTest is TestSetup {
         assertEq(psyToken.balanceOf(address(tokenSale)), 100);
     }
 
-    function setupFork() public {
+    function setUpFork() public {
         sepoliaFork = vm.createFork(SEPOLIA_RPC_URL);
         mainnetFork = vm.createFork(MAINNET_RPC_URL);
         vm.selectFork(mainnetFork);
