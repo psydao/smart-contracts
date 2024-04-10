@@ -13,14 +13,14 @@ contract WithdrawUserFundsTest is TestSetup {
 
         uint256[] memory tokensForAlice = new uint256[](3);
         tokensForAlice[0] = 0;
-        tokensForAlice[1] = 2;
-        tokensForAlice[2] = 3;
+        tokensForAlice[1] = 1;
+        tokensForAlice[2] = 2;
 
         transferNftToUser(address(alice), tokensForAlice);
     }
 
     function test_FailsIfUserHasInsufficientBalance() public {
-        setupContractWithEth();
+        setUpContractWithEth();
 
         vm.prank(address(alice));
         vm.expectRevert("Treasury: User Insufficient Balance");
@@ -28,13 +28,13 @@ contract WithdrawUserFundsTest is TestSetup {
     }
 
     function test_FailsIfContractHasInsufficientBalance() public {
-        setupContractWithEth();
+        setUpContractWithEth();
         
         vm.prank(address(core));
         treasury.exit(2, address(alice));
 
         vm.prank(owner);
-        treasury.withdrawFundsAsPsyDao(address(owner), 5 ether);
+        treasury.withdrawFundsAsPsyDao(address(owner), 3 ether);
 
         vm.prank(address(alice));
         vm.expectRevert("Treasury: Insufficient Balance");
@@ -42,7 +42,7 @@ contract WithdrawUserFundsTest is TestSetup {
     }
 
     function test_WithdrawsUserFunds() public {
-        setupContractWithEth();
+        setUpContractWithEth();
 
         uint256 aliceBalance = address(alice).balance;
         assertEq(treasury.userBalances(address(alice)), 0);
@@ -56,13 +56,13 @@ contract WithdrawUserFundsTest is TestSetup {
         treasury.withdrawUserFunds();
         
         assertEq(address(alice).balance, aliceBalance + 1 ether);
-        assertEq(address(treasury).balance, 4 ether);
+        assertEq(address(treasury).balance, 2 ether);
         assertEq(treasury.userBalances(address(alice)), 0);
     }
 
-    function setupContractWithEth() public {
+    function setUpContractWithEth() public {
         vm.deal(address(alice), 10 ether);
         vm.prank(alice);
-        (bool sent, ) = address(treasury).call{value: 5 ether}("");
+        (bool sent, ) = address(treasury).call{value: 3 ether}("");
     }
 }

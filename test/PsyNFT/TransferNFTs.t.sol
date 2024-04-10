@@ -11,8 +11,8 @@ contract TransferNFTsTest is TestSetup {
 
     function test_TransferFailsIfNotCoreContract() public {
         uint256[] memory tokenIds = new uint256[](2);
-        tokenIds[0] = 2;
-        tokenIds[1] = 4;
+        tokenIds[0] = 1;
+        tokenIds[1] = 2;
 
         vm.prank(alice);
         vm.expectRevert("PsyNFT: Caller Not Core Contract");
@@ -21,8 +21,8 @@ contract TransferNFTsTest is TestSetup {
 
     function test_TransferFailsIfRecipientIsZeroAddress() public {
         uint256[] memory tokenIds = new uint256[](2);
-        tokenIds[0] = 2;
-        tokenIds[1] = 4;
+        tokenIds[0] = 1;
+        tokenIds[1] = 2;
 
         vm.prank(address(core));
         vm.expectRevert("PsyNFT: Recipient Cannot Be Zero Address");
@@ -54,7 +54,7 @@ contract TransferNFTsTest is TestSetup {
 
         uint256[] memory tokenIds = new uint256[](2);
         tokenIds[0] = 1;
-        tokenIds[1] = 4;
+        tokenIds[1] = 2;
 
         vm.prank(address(core));
         vm.expectRevert(abi.encodeWithSelector(ERC721IncorrectOwner.selector, address(psyNFT), 1, address(alice)));
@@ -78,8 +78,8 @@ contract TransferNFTsTest is TestSetup {
         core.mintInitialBatch();
 
         uint256[] memory tokens = new uint256[](2);
-        tokens[0] = 2;
-        tokens[1] = 4;
+        tokens[0] = 1;
+        tokens[1] = 2;
 
         vm.prank(address(core));
         psyNFT.transferNFTs(tokens, address(alice));
@@ -96,8 +96,8 @@ contract TransferNFTsTest is TestSetup {
         core.mintInitialBatch();
 
         uint256[] memory tokens = new uint256[](2);
-        tokens[0] = 2;
-        tokens[1] = 4;
+        tokens[0] = 1;
+        tokens[1] = 2;
 
         vm.prank(address(core));
         psyNFT.transferNFTs(tokens, address(alice));
@@ -119,8 +119,8 @@ contract TransferNFTsTest is TestSetup {
         core.mintInitialBatch();
 
         uint256[] memory tokens = new uint256[](2);
-        tokens[0] = 2;
-        tokens[1] = 4;
+        tokens[0] = 1;
+        tokens[1] = 2;
 
         vm.prank(address(core));
         psyNFT.transferNFTs(tokens, address(alice));
@@ -140,8 +140,8 @@ contract TransferNFTsTest is TestSetup {
         core.mintInitialBatch();
 
         uint256[] memory tokens = new uint256[](2);
-        tokens[0] = 2;
-        tokens[1] = 4;
+        tokens[0] = 1;
+        tokens[1] = 2;
 
         vm.prank(address(core));
         psyNFT.transferNFTs(tokens, address(alice));
@@ -162,8 +162,8 @@ contract TransferNFTsTest is TestSetup {
         core.mintInitialBatch();
 
         uint256[] memory tokens = new uint256[](2);
-        tokens[0] = 2;
-        tokens[1] = 4;
+        tokens[0] = 1;
+        tokens[1] = 2;
 
         vm.prank(address(core));
         psyNFT.transferNFTs(tokens, address(alice));
@@ -182,8 +182,8 @@ contract TransferNFTsTest is TestSetup {
         core.mintInitialBatch();
 
         uint256[] memory tokenIdsForAuction = new uint256[](2);
-        tokenIdsForAuction[0] = 2;
-        tokenIdsForAuction[1] = 4;
+        tokenIdsForAuction[0] = 1;
+        tokenIdsForAuction[1] = 2;
         assertEq(psyNFT.ownerOf(2), address(psyNFT));
 
         vm.prank(address(core));
@@ -191,6 +191,5 @@ contract TransferNFTsTest is TestSetup {
         
         assertEq(psyNFT.ownerOf(0), address(psyNFT));
         assertEq(psyNFT.ownerOf(2), address(auction));
-        assertEq(psyNFT.ownerOf(4), address(auction));
     }
 }

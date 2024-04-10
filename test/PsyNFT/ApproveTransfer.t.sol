@@ -13,8 +13,8 @@ contract ApproveTransferTest is TestSetup {
         core.mintInitialBatch();
 
         tokens[0] = 0;
-        tokens[1] = 2;
-        tokens[2] = 3;
+        tokens[1] = 1;
+        tokens[2] = 2;
     }
 
     function test_FailsIfNotCalledByCoreContract() public {
@@ -40,12 +40,12 @@ contract ApproveTransferTest is TestSetup {
     }
 
     function test_ApprovingTransferWorksCorrectly() public {
-        transferNftToUser(address(alice), tokens);        
+        transferNftToUser(address(alice), tokens);    
 
         (, uint256 initialTransferExpiryDate,) = psyNFT.approvedTransfers(2);
-        
+
         assertEq(initialTransferExpiryDate, 0);
-        
+
         vm.prank(address(core));
         psyNFT.approveTransfer(2, address(bob), 400);
 

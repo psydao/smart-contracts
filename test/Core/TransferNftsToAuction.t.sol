@@ -13,8 +13,8 @@ contract TransferNftsToAuctionTest is TestSetup {
 
     function test_TransferFailsIfNotContractOwner() public {
         uint256[] memory tokenIds = new uint256[](2);
-        tokenIds[0] = 2;
-        tokenIds[1] = 4;
+        tokenIds[0] = 1;
+        tokenIds[1] = 2;
 
         vm.prank(alice);
         vm.expectRevert(abi.encodeWithSelector(OwnableUnauthorizedAccount.selector, address(alice)));
@@ -26,17 +26,17 @@ contract TransferNftsToAuctionTest is TestSetup {
         core.mintInitialBatch();
 
         uint256[] memory tokenIdsForAuction = new uint256[](2);
-        tokenIdsForAuction[0] = 2;
-        tokenIdsForAuction[1] = 4;
+        tokenIdsForAuction[0] = 1;
+        tokenIdsForAuction[1] = 2;
+        assertEq(psyNFT.ownerOf(1), address(psyNFT));
         assertEq(psyNFT.ownerOf(2), address(psyNFT));
-        assertEq(psyNFT.ownerOf(4), address(psyNFT));
 
         vm.prank(owner);
         core.transferNftsToAuction(tokenIdsForAuction);
         
         assertEq(psyNFT.ownerOf(0), address(psyNFT));
+        assertEq(psyNFT.ownerOf(1), address(auction));
         assertEq(psyNFT.ownerOf(2), address(auction));
-        assertEq(psyNFT.ownerOf(4), address(auction));
     }
 
     

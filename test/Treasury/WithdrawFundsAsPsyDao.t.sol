@@ -13,8 +13,8 @@ contract WithdrawFundsAsPsyDaoTest is TestSetup {
 
         uint256[] memory tokensForAlice = new uint256[](3);
         tokensForAlice[0] = 0;
-        tokensForAlice[1] = 2;
-        tokensForAlice[2] = 3;
+        tokensForAlice[1] = 1;
+        tokensForAlice[2] = 2;
 
         transferNftToUser(address(alice), tokensForAlice);
 

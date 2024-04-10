@@ -13,8 +13,8 @@ contract MintSublicencesTest is TestSetup {
 
         uint256[] memory tokensForAlice = new uint256[](3);
         tokensForAlice[0] = 0;
-        tokensForAlice[1] = 2;
-        tokensForAlice[2] = 3;
+        tokensForAlice[1] = 1;
+        tokensForAlice[2] = 2;
 
         transferNftToUser(address(alice), tokensForAlice);
     }
@@ -32,17 +32,17 @@ contract MintSublicencesTest is TestSetup {
         core.mintSublicenses(2, 100);
         assertEq(sublicencesNft.balanceOf(address(alice), 2), 100);
 
-        assertEq(sublicencesNft.balanceOf(address(alice), 3), 0);
+        assertEq(sublicencesNft.balanceOf(address(alice), 1), 0);
         vm.prank(alice);
-        core.mintSublicenses(3, 12000);
-        assertEq(sublicencesNft.balanceOf(address(alice), 3), 12000);
+        core.mintSublicenses(1, 12000);
+        assertEq(sublicencesNft.balanceOf(address(alice), 1), 12000);
 
         vm.prank(alice);
-        sublicencesNft.safeTransferFrom(address(alice), address(bob), 3, 11000, "");
+        sublicencesNft.safeTransferFrom(address(alice), address(bob), 1, 11000, "");
 
         assertEq(sublicencesNft.balanceOf(address(alice), 2), 100);
         assertEq(sublicencesNft.balanceOf(address(bob), 2), 0);
-        assertEq(sublicencesNft.balanceOf(address(alice), 3), 1000);
-        assertEq(sublicencesNft.balanceOf(address(bob), 3), 11000);
+        assertEq(sublicencesNft.balanceOf(address(alice), 1), 1000);
+        assertEq(sublicencesNft.balanceOf(address(bob), 1), 11000);
     }
 }

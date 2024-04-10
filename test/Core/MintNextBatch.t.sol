@@ -19,7 +19,7 @@ contract MintNextBatchTest is TestSetup {
     }
 
     function test_BatchMintWorks() public {
-        assertEq(psyNFT.previousFibonacci(), 3);
+        assertEq(psyNFT.previousFibonacci(), 2);
         assertEq(psyNFT.tokenId(), 0);
         assertEq(psyNFT.balanceOf(address(psyNFT)), 0);
        
@@ -32,9 +32,9 @@ contract MintNextBatchTest is TestSetup {
         core.mintNextBatch();
         core.mintNextBatch();
 
-        assertEq(psyNFT.previousFibonacci(), 34);
-        assertEq(psyNFT.tokenId(), 55);
-        assertEq(psyNFT.balanceOf(address(psyNFT)), 55);
+        assertEq(psyNFT.previousFibonacci(), 21);
+        assertEq(psyNFT.tokenId(), 34);
+        assertEq(psyNFT.balanceOf(address(psyNFT)), 34);
 
         vm.stopPrank();
     }

@@ -13,8 +13,8 @@ contract BurnTest is TestSetup {
         core.mintInitialBatch();
 
         tokens[0] = 0;
-        tokens[1] = 2;
-        tokens[2] = 3;
+        tokens[1] = 1;
+        tokens[2] = 2;
     }
 
     function test_BurnNftFailsIfCallerIsNotTreasury() public {
