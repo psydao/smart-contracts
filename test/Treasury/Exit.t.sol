@@ -15,8 +15,8 @@ contract ExitTest is TestSetup {
 
         uint256[] memory tokensForAlice = new uint256[](3);
         tokensForAlice[0] = 0;
-        tokensForAlice[1] = 2;
-        tokensForAlice[2] = 3;
+        tokensForAlice[1] = 1;
+        tokensForAlice[2] = 2;
 
         transferNftToUser(address(alice), tokensForAlice);
 
@@ -40,7 +40,7 @@ contract ExitTest is TestSetup {
     function test_RageQuitWorksPerfectly() public {
 
         assertEq(address(treasury).balance, 5 ether);
-        assertEq(psyNFT.tokenId(), 5);
+        assertEq(psyNFT.tokenId(), 3);
         uint256 aliceBalance = address(alice).balance;
 
         assertEq(psyNFT.ownerOf(0), address(alice));

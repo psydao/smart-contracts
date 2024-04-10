@@ -22,7 +22,7 @@ contract InitialMintTest is TestSetup {
     }
 
     function test_InitialMintWorks() public {
-        assertEq(psyNFT.previousFibonacci(), 3);
+        assertEq(psyNFT.previousFibonacci(), 2);
         assertEq(psyNFT.tokenId(), 0);
         assertEq(psyNFT.initialMintCalled(), false);
         assertEq(psyNFT.balanceOf(address(psyNFT)), 0);
@@ -30,9 +30,9 @@ contract InitialMintTest is TestSetup {
         vm.prank(address(core));
         psyNFT.initialMint();
 
-        assertEq(psyNFT.previousFibonacci(), 3);
-        assertEq(psyNFT.tokenId(), 5);
+        assertEq(psyNFT.previousFibonacci(), 2);
+        assertEq(psyNFT.tokenId(), 3);
         assertEq(psyNFT.initialMintCalled(), true);
-        assertEq(psyNFT.balanceOf(address(psyNFT)), 5);
+        assertEq(psyNFT.balanceOf(address(psyNFT)), 3);
     }
 }
