@@ -40,6 +40,12 @@ contract DeploySuite is Script {
         psyToken = new TestPsyToken("TestPsy", "PSY");
         tokenSale = new TokenSale(address(psyToken), chainlinkSepoliaPriceFeed, originalTokenPrice);
 
+        //Setup functions
+        psyNft.setCoreContract(address(core));
+        nftSublicences.setCoreContract(address(core));
+        psyNft.setTreasury(address(treasury));
+        treasury.setCoreContract(address(core));
+
         console.log("PsyNFT Address: ", address(psyNft));
         console.log("ERC1155 Address: ", address(nftSublicences));
         console.log("Treasury Address: ", address(treasury));
