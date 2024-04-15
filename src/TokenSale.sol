@@ -108,7 +108,6 @@ contract TokenSale is Ownable2Step, ReentrancyGuard {
     /**
      * @notice Unlocks the token for withdrawal.
      * @dev Only the contract owner can call this function.
-     * @dev The sale status must be set to PAUSED in order to unlock the token.
      */
     function unlockToken() external onlyOwner {
         require(tokensLocked, "TokenSale: Tokens Already Unlocked");
