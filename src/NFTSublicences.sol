@@ -10,8 +10,6 @@ contract NFTSublicences is ERC1155, Ownable {
 
     address public core;
 
-    mapping(uint256 => uint256) public psyNftSublicenseSupply;
-
     constructor(address _psyNft, string memory _initUri) ERC1155(_initUri) Ownable(msg.sender) {
         psyNFT = PsyNFT(_psyNft);
     }
