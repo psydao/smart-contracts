@@ -10,6 +10,7 @@ contract Treasury is Ownable2Step, ReentrancyGuard {
     PsyNFT public psyNFT;
 
     uint256 public ethBalance;
+    uint256 public totalPendingWithdrawals;
     address public core;
 
     mapping(address => uint256) public userBalances;
@@ -30,6 +31,7 @@ contract Treasury is Ownable2Step, ReentrancyGuard {
 
         uint256 payout = _calculateProRataPayout();
         userBalances[_user] += payout;
+        totalPendingWithdrawals += payout;
         ethBalance -= payout;
 
         psyNFT.burn(_tokenId);
@@ -59,6 +61,7 @@ contract Treasury is Ownable2Step, ReentrancyGuard {
         require(address(this).balance >= amountToSend, "Treasury: Insufficient Balance");
 
         userBalances[msg.sender] = 0;
+        totalPendingWithdrawals -= amountToSend;
 
         (bool sent,) = msg.sender.call{value: amountToSend}("");
         require(sent, "Failed to send Ether");
@@ -77,7 +80,7 @@ contract Treasury is Ownable2Step, ReentrancyGuard {
         onlyOwner
         nonReentrant
     {
-        require(ethBalance >= _amount, "Treasury: Insufficient Balance");
+        require(address(this).balance - totalPendingWithdrawals >= _amount, "Treasury: Insufficient Balance");
         require(_amount > 0, "Treasury: Cannot Withdraw Zero");
 
         ethBalance -= _amount;
