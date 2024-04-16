@@ -56,7 +56,7 @@ contract Treasury is Ownable2Step, ReentrancyGuard {
         require(userBalances[msg.sender] > 0, "Treasury: User Insufficient Balance");
 
         uint256 amountToSend = userBalances[msg.sender];
-        require(ethBalance >= amountToSend, "Treasury: Insufficient Balance");
+        require(address(this).balance >= amountToSend, "Treasury: Insufficient Balance");
 
         userBalances[msg.sender] = 0;
 
