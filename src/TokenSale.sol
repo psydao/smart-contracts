@@ -13,6 +13,7 @@ contract TokenSale is Ownable2Step, ReentrancyGuard {
     uint256 public tokenPriceInDollar;
     uint256 public totalTokensForSale;
     uint256 constant ETH_AMOUNT_MULTIPLIER = 1e10;
+    uint256 immutable CHAINLINK_STALE_DATA_PERIOD = 3 hours;
 
     bool public saleActive;
     bool public tokensLocked;
@@ -189,7 +190,12 @@ contract TokenSale is Ownable2Step, ReentrancyGuard {
      * @return The dollar amount per Ether as an unsigned integer.
      */
     function _getDollarAmountPerEth() internal returns (uint256) {
-        (, int256 amount,,,) = dataFeed.latestRoundData();
+        (uint80 roundID, int256 amount, , uint256 updatedAt, uint80 answeredInRound) = dataFeed.latestRoundData();
+
+        require(answeredInRound >= roundID, "TokenSale: Stale price");
+        require(updatedAt >= block.timestamp - CHAINLINK_STALE_DATA_PERIOD, "TokenSale: Incomplete Round");
+        require(amount > 0, "TokenSale: Invalid price");
+        
         return uint256(amount);
     }
 }
