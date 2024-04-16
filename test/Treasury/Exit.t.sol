@@ -37,7 +37,7 @@ contract ExitTest is TestSetup {
         treasury.exit(0, address(alice));
     }
 
-    function test_RageQuitWorksPerfectly() public {
+    function test_ExitWorks() public {
 
         assertEq(address(treasury).balance, 5 ether);
         assertEq(psyNFT.tokenId(), 3);
