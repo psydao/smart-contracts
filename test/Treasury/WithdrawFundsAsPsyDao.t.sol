@@ -41,6 +41,15 @@ contract WithdrawFundsAsPsyDaoTest is TestSetup {
         treasury.withdrawFundsAsPsyDao(address(owner), 12 ether);
     }
 
+    function test_FailsIfInsufficientBalanceDueToPendingWithdrawals() public {
+        vm.prank(address(core));
+        treasury.exit(0, address(alice));
+
+        vm.prank(address(owner));
+        vm.expectRevert("Treasury: Insufficient Balance");
+        treasury.withdrawFundsAsPsyDao(address(owner), 4 ether);
+    }
+
     function test_FailsIfWithdrawingNothing() public {
         vm.prank(address(owner));
         vm.expectRevert("Treasury: Cannot Withdraw Zero");
@@ -57,6 +66,4 @@ contract WithdrawFundsAsPsyDaoTest is TestSetup {
         assertEq(address(owner).balance, ownerBalance + 2 ether);
         assertEq(address(treasury).balance, 3 ether);
     }
-
-    
 }

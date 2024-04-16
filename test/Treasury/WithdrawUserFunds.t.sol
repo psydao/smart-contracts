@@ -37,6 +37,7 @@ contract WithdrawUserFundsTest is TestSetup {
         treasury.exit(2, address(alice));
 
         assertEq(treasury.userBalances(address(alice)), 1 ether);
+        assertEq(treasury.totalPendingWithdrawals(), 1 ether);
 
         vm.prank(alice);
         treasury.withdrawUserFunds();
@@ -44,6 +45,7 @@ contract WithdrawUserFundsTest is TestSetup {
         assertEq(address(alice).balance, aliceBalance + 1 ether);
         assertEq(address(treasury).balance, 2 ether);
         assertEq(treasury.userBalances(address(alice)), 0);
+        assertEq(treasury.totalPendingWithdrawals(), 0 ether);
     }
 
     function setUpContractWithEth() public {

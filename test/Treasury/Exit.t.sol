@@ -38,7 +38,6 @@ contract ExitTest is TestSetup {
     }
 
     function test_ExitWorks() public {
-
         assertEq(address(treasury).balance, 5 ether);
         assertEq(psyNFT.tokenId(), 3);
         uint256 aliceBalance = address(alice).balance;
@@ -50,5 +49,6 @@ contract ExitTest is TestSetup {
         treasury.exit(0, address(alice));
 
         assertEq(treasury.userBalances(address(alice)), treasuryPortion);
+        assertEq(treasury.totalPendingWithdrawals(), treasuryPortion);
     }
 }
