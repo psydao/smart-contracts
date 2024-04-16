@@ -30,6 +30,7 @@ contract Treasury is Ownable2Step, ReentrancyGuard {
 
         uint256 payout = _calculateProRataPayout();
         userBalances[_user] += payout;
+        ethBalance -= payout;
 
         psyNFT.burn(_tokenId);
     }
@@ -76,8 +77,10 @@ contract Treasury is Ownable2Step, ReentrancyGuard {
         onlyOwner
         nonReentrant
     {
-        require(address(this).balance >= _amount, "Treasury: Insufficient Balance");
+        require(ethBalance >= _amount, "Treasury: Insufficient Balance");
         require(_amount > 0, "Treasury: Cannot Withdraw Zero");
+
+        ethBalance -= _amount;
 
         (bool sent,) = _receiver.call{value: _amount}("");
         require(sent, "Failed to send Ether");

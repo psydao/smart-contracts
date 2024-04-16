@@ -27,20 +27,6 @@ contract WithdrawUserFundsTest is TestSetup {
         treasury.withdrawUserFunds();
     }
 
-    function test_FailsIfContractHasInsufficientBalance() public {
-        setUpContractWithEth();
-        
-        vm.prank(address(core));
-        treasury.exit(2, address(alice));
-
-        vm.prank(owner);
-        treasury.withdrawFundsAsPsyDao(address(owner), 3 ether);
-
-        vm.prank(address(alice));
-        vm.expectRevert("Treasury: Insufficient Balance");
-        treasury.withdrawUserFunds();
-    }
-
     function test_WithdrawsUserFunds() public {
         setUpContractWithEth();
 
@@ -64,5 +50,6 @@ contract WithdrawUserFundsTest is TestSetup {
         vm.deal(address(alice), 10 ether);
         vm.prank(alice);
         (bool sent, ) = address(treasury).call{value: 3 ether}("");
+        assertEq(treasury.ethBalance(), 3 ether);
     }
 }
