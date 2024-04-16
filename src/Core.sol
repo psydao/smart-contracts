@@ -14,8 +14,6 @@ contract Core is Ownable2Step {
     address public auctionContract;
     bool public rageQuitAllowed;
 
-    mapping(uint256 => address) public batchToAuctionAddress;
-
     constructor(address _psyNFT, address _sublicenseNFT, address _auction, address _treasury) Ownable(msg.sender) {
         require(_psyNFT != address(0), "Core: Cannot Be Zero Address");
         require(_sublicenseNFT != address(0), "Core: Cannot Be Zero Address");
