@@ -92,17 +92,17 @@ contract BuyTokensTest is TestSetup {
     }
 
     function test_SalePausedIfSupplyRunsOut() public {
-        psyToken.mint(address(owner), 1 ether);
+        psyToken.mint(address(owner), 9 ether);
         vm.startPrank(owner);
-        psyToken.approve(address(tokenSale), 1 ether);
-        tokenSale.depositPsyTokensForSale(9);
+        psyToken.approve(address(tokenSale), 9 ether);
+        tokenSale.depositPsyTokensForSale(9e18);
 
         assertEq(tokenSale.saleActive(), true);
 
         uint256 amountAliceMustPay = tokenSale.calculateEthAmountPerPsyToken() * 9;
 
         vm.startPrank(alice);
-        tokenSale.buyTokens{value: amountAliceMustPay}(9);
+        tokenSale.buyTokens{value: amountAliceMustPay}(9e18);
         assertEq(tokenSale.saleActive(), false);
     }
 

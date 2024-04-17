@@ -37,7 +37,7 @@ contract DeploySuite is Script {
         treasury = new Treasury(address(psyNft));
         core = new Core(address(psyNft), address(nftSublicences), address(treasury));
         psyToken = new TestPsyToken("TestPsy", "PSY");
-        tokenSale = new TokenSale(address(psyToken), chainlinkSepoliaPriceFeed, originalTokenPrice);
+        tokenSale = new TokenSale(address(psyToken), chainlinkMainnetPriceFeed, originalTokenPrice);
 
         //Setup functions
         psyNft.setCoreContract(address(core));
