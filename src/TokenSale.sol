@@ -150,7 +150,7 @@ contract TokenSale is Ownable2Step, ReentrancyGuard {
 
     /**
      * @notice Calculates the amount of Ether required to purchase one PsyToken.
-     * @dev The token price in USDC must be greater than 0.
+     * @dev The token price in USD must be greater than 0.
      * @return The amount of Ether required to purchase one PsyToken, multiplied by ETH_AMOUNT_MULTIPLIER.
      */
     function calculateEthAmountPerPsyToken() public returns (uint256) {
