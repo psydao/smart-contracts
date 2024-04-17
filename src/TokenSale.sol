@@ -158,7 +158,7 @@ contract TokenSale is Ownable2Step, ReentrancyGuard {
 
         uint256 dollarPricePerEth = _getDollarAmountPerEth();
         uint256 adjustedPrice = dollarPricePerEth * ETH_AMOUNT_MULTIPLIER;
-        uint256 ethAmount = tokenPriceInDollar / adjustedPrice;
+        uint256 ethAmount = tokenPriceInDollar / adjustedPrice + 1;
 
         return ethAmount;
     }
