@@ -52,7 +52,7 @@ contract TokenSale is Ownable2Step, ReentrancyGuard {
         require(_hasSufficientSupplyForPurchase(_amountOfPsyTokens), "TokenSale: Not enough supply");
 
         uint256 ethPricePerToken = calculateEthAmountPerPsyToken();
-        uint256 ethAmount = _amountOfPsyTokens * ethPricePerToken;
+        uint256 ethAmount = _amountOfPsyTokens * ethPricePerToken / 1e18;
         require(msg.value == ethAmount, "TokenSale: Incorrect Amount Sent In");
         require(ethAmount > 0, "TokenSale: Insufficient Funds");
 
