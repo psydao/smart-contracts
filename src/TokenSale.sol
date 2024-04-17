@@ -13,7 +13,7 @@ contract TokenSale is Ownable2Step, ReentrancyGuard {
     uint256 public tokenPriceInDollar;
     uint256 public totalTokensForSale;
     uint256 constant ETH_AMOUNT_MULTIPLIER = 10**10;
-    uint256 immutable CHAINLINK_STALE_DATA_PERIOD = 3 hours;
+    uint256 immutable CHAINLINK_STALE_DATA_PERIOD = 1 hours;
 
     bool public saleActive;
     bool public tokensLocked;
@@ -157,10 +157,9 @@ contract TokenSale is Ownable2Step, ReentrancyGuard {
         require(tokenPriceInDollar != 0, "TokenSale: Token Is Free");
 
         uint256 dollarPricePerEth = _getDollarAmountPerEth();
-        uint256 adjustedPrice = dollarPricePerEth * ETH_AMOUNT_MULTIPLIER;
-        uint256 ethAmount = tokenPriceInDollar / adjustedPrice + 1;
+        uint256 ethAmount = tokenPriceInDollar / dollarPricePerEth + 1;
 
-        return ethAmount;
+        return ethAmount * ETH_AMOUNT_MULTIPLIER;
     }
 
     /**
