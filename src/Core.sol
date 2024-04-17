@@ -153,6 +153,16 @@ contract Core is Ownable2Step {
         treasury.exit(_tokenId, _user);
     }
 
+    /**
+     * @notice Updates the address of the treasury contract.
+     * @dev This function can only be called by the contract owner.
+     * @param _treasury The new address of the treasury contract.
+     */
+    function updateTreasury(address _treasury) external onlyOwner {
+        require(_treasury != address(0), "Core: Cannot Be Zero Address");
+        treasury = Treasury(payable(_treasury));
+    }
+
     // --------------------------------------------------------------------------------------------------------------------
     // ----------------------------------------------> INTERNAL FUNCTIONS <------------------------------------------------
     // --------------------------------------------------------------------------------------------------------------------

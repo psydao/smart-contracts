@@ -36,8 +36,7 @@ contract DeploySuite is Script {
         nftSublicences = new NFTSublicences(address(psyNft), "");
         treasury = new Treasury(address(psyNft));
         core = new Core(address(psyNft), address(nftSublicences), address(treasury));
-        psyToken = new TestPsyToken("TestPsy", "PSY");
-        tokenSale = new TokenSale(address(psyToken), chainlinkMainnetPriceFeed, originalTokenPrice);
+        tokenSale = new TokenSale("0x2196B84EaCe74867b73fb003AfF93C11FcE1D47A", chainlinkMainnetPriceFeed, originalTokenPrice);
 
         //Setup functions
         psyNft.setCoreContract(address(core));
@@ -50,6 +49,5 @@ contract DeploySuite is Script {
         console.log("Treasury Address: ", address(treasury));
         console.log("Core Address: ", address(core));
         console.log("Token Sale Address: ", address(tokenSale));
-        console.log("Test PsyToken Address: ", address(psyToken));
     }
 }
