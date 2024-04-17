@@ -3,12 +3,16 @@ pragma solidity 0.8.20;
 
 import "../TestSetup.sol";
 import "../../src/PsyNFT.sol";
+import "../../src/Auction.sol";
 
 
 contract TransferNftsToAuctionTest is TestSetup {
 
     function setUp() public {
         setUpTests();
+        auction = new Auction();
+        vm.prank(owner);
+        core.setAuctionContract(address(auction));
     }
 
     function test_TransferFailsIfNotContractOwner() public {

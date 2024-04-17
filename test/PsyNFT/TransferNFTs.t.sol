@@ -7,6 +7,9 @@ contract TransferNFTsTest is TestSetup {
 
     function setUp() public {
         setUpTests();
+        auction = new Auction();
+        vm.prank(owner);
+        core.setAuctionContract(address(auction));
     }
 
     function test_TransferFailsIfNotCoreContract() public {

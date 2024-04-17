@@ -14,16 +14,14 @@ contract Core is Ownable2Step {
     address public auctionContract;
     bool public rageQuitAllowed;
 
-    constructor(address _psyNFT, address _sublicenseNFT, address _auction, address _treasury) Ownable(msg.sender) {
+    constructor(address _psyNFT, address _sublicenseNFT, address _treasury) Ownable(msg.sender) {
         require(_psyNFT != address(0), "Core: Cannot Be Zero Address");
         require(_sublicenseNFT != address(0), "Core: Cannot Be Zero Address");
-        require(_auction != address(0), "Core: Cannot Be Zero Address");
         require(_treasury != address(0), "Core: Cannot Be Zero Address");
 
         psyNFT = PsyNFT(_psyNFT);
         nftSublicenses = NFTSublicences(_sublicenseNFT);
         treasury = Treasury(payable(_treasury));
-        auctionContract = _auction;
         rageQuitAllowed = false;
     }
 
@@ -48,6 +46,17 @@ contract Core is Ownable2Step {
     function disableRageQuit() external onlyOwner {
         require(rageQuitAllowed, "Core: Rage Quit Already Disabled");
         rageQuitAllowed = false;
+    }
+
+    /**
+     * @notice Sets the address of the auction contract.
+     * @dev This function can only be called by the contract owner.
+     * @param _auction The address of the auction contract.
+     * @dev The auction contract address cannot be a zero address.
+     */
+    function setAuctionContract(address _auction) external onlyOwner {
+        require(_auction != address(0), "Core: Cannot Be Zero Address");
+        auctionContract = _auction;
     }
 
     // --------------------------------------------------------------------------------------------------------------------
@@ -76,6 +85,7 @@ contract Core is Ownable2Step {
      * @param _tokenIds An array of token IDs to be transferred.
      */
     function transferNftsToAuction(uint256[] memory _tokenIds) external onlyOwner {
+        require(auctionContract != address(0), "Core: Auction Address Not Set");
         _transfer(_tokenIds, auctionContract);
     }
 

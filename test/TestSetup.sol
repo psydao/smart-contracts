@@ -38,9 +38,8 @@ contract TestSetup is Test {
         vm.startPrank(owner);
         psyNFT = new PsyNFT();
         sublicencesNft = new NFTSublicences(address(psyNFT), "");
-        auction = new Auction();
         treasury = new Treasury(address(psyNFT));
-        core = new Core(address(psyNFT), address(sublicencesNft), address(auction), address(treasury));
+        core = new Core(address(psyNFT), address(sublicencesNft), address(treasury));
         psyToken = new TestPsyToken("TestPsy", "PSY");
         tokenSale = new TokenSale(address(psyToken), chainlinkMainnetPriceFeed, originalTokenPrice);
         psyNFT.setCoreContract(address(core));

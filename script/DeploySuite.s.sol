@@ -32,11 +32,10 @@ contract DeploySuite is Script {
         vm.startBroadcast(deployerPrivateKey);
 
         // Deploy contracts
-        auction = new Auction();
         psyNft = new PsyNFT();
         nftSublicences = new NFTSublicences(address(psyNft), "");
         treasury = new Treasury(address(psyNft));
-        core = new Core(address(psyNft), address(nftSublicences), address(auction), address(treasury));
+        core = new Core(address(psyNft), address(nftSublicences), address(treasury));
         psyToken = new TestPsyToken("TestPsy", "PSY");
         tokenSale = new TokenSale(address(psyToken), chainlinkSepoliaPriceFeed, originalTokenPrice);
 
@@ -52,6 +51,5 @@ contract DeploySuite is Script {
         console.log("Core Address: ", address(core));
         console.log("Token Sale Address: ", address(tokenSale));
         console.log("Test PsyToken Address: ", address(psyToken));
-        console.log("Auction Address: ", address(auction));
     }
 }
