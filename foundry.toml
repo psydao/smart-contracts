@@ -2,6 +2,7 @@
 solc = "0.8.20"
 bytecode_hash = "none"
 optimizer_runs = 1000000
+gas_reports = ["*"]
 
 [profile.intense.fuzz]
 runs = 10000

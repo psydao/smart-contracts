@@ -16,7 +16,6 @@ contract DeploySuite is Script {
 
     /*---- Storage variables ----*/
 
-    TestPsyToken public psyToken;
     Auction public auction;
     Treasury public treasury;
     Core public core;
@@ -25,6 +24,7 @@ contract DeploySuite is Script {
     TokenSale public tokenSale;
     address chainlinkMainnetPriceFeed = 0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419;
     address chainlinkSepoliaPriceFeed = 0x694AA1769357215DE4FAC081bf1f309aDC325306;
+    address psyToken = 0x2196B84EaCe74867b73fb003AfF93C11FcE1D47A;
     uint256 originalTokenPrice = 0.1 ether;
 
     function run() external {
@@ -36,7 +36,7 @@ contract DeploySuite is Script {
         nftSublicences = new NFTSublicences(address(psyNft), "");
         treasury = new Treasury(address(psyNft));
         core = new Core(address(psyNft), address(nftSublicences), address(treasury));
-        tokenSale = new TokenSale("0x2196B84EaCe74867b73fb003AfF93C11FcE1D47A", chainlinkMainnetPriceFeed, originalTokenPrice);
+        tokenSale = new TokenSale(psyToken, chainlinkMainnetPriceFeed, originalTokenPrice);
 
         //Setup functions
         psyNft.setCoreContract(address(core));
